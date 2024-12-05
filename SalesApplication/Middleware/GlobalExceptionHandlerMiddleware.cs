@@ -23,6 +23,12 @@ namespace SalesApplication.Middleware
             try
             {
                 await _next(httpContext); // Continue processing the request
+
+                // Handle 403 Forbidden for unauthorized access
+                if (httpContext.Response.StatusCode == StatusCodes.Status403Forbidden && !httpContext.Response.HasStarted)
+                {
+                    await HandleForbiddenAsync(httpContext);
+                }
             }
             catch (Exception ex)
             {
@@ -31,21 +37,45 @@ namespace SalesApplication.Middleware
             }
         }
 
+        /// <summary>
+        /// Handles exceptions and returns a consistent JSON error response.
+        /// </summary>
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            // Set the response status code based on exception type
+            // Set status code using switch expression
             context.Response.StatusCode = exception switch
             {
                 KeyNotFoundException => StatusCodes.Status404NotFound,
-                ArgumentException => StatusCodes.Status400BadRequest,
+                ArgumentException or ArgumentNullException => StatusCodes.Status400BadRequest,
                 DbUpdateException => StatusCodes.Status500InternalServerError,
-                _ => StatusCodes.Status500InternalServerError
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                _ => StatusCodes.Status500InternalServerError // Generic server error
             };
 
             context.Response.ContentType = "application/json";
 
-            // Only include the message in the response, omitting the details (stack trace)
-            var response = new { message = exception.Message };
+            // Construct a simplified error response with just the message
+            var response = new
+            {
+                status = context.Response.StatusCode,
+                message = exception.Message
+            };
+
+            // Serialize and write the response as JSON
+            return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+        }
+
+        /// <summary>
+        /// Handles unauthorized access (403 Forbidden) and returns a JSON response.
+        /// </summary>
+        private Task HandleForbiddenAsync(HttpContext context)
+        {
+            context.Response.ContentType = "application/json";
+            var response = new
+            {
+                status = StatusCodes.Status403Forbidden,
+                message = "Unauthorized access"
+            };
 
             return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
         }

@@ -18,7 +18,15 @@ namespace SalesApplication.IServices.Services
         public async Task<List<TerritoryDto>> GetTerritory()
         {
                 var getterritory = await _context.Territories.ToListAsync();
-                return _mapper.Map<List<TerritoryDto>>(getterritory);
+            var territoryDtos = _mapper.Map<List<TerritoryDto>>(getterritory);
+
+            // Trim TerritoryDescription for each DTO
+            foreach (var territory in territoryDtos)
+            {
+                territory.TerritoryDescription = territory.TerritoryDescription.Trim();
+            }
+
+            return territoryDtos;
         }
     }
 }

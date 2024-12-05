@@ -17,7 +17,7 @@ namespace SalesApplication.Controllers
             _shipperService = shipperService;
         }
 
-        [Authorize(Roles = "Admin,Shipper")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateShipper(ShipperDto shipperDto)
         {
@@ -37,19 +37,19 @@ namespace SalesApplication.Controllers
         [HttpGet("totalamountearnedbyshipper/{date}")]
         public async Task<IActionResult> GetTotalAmountEarnedByShipperOnDateAsync(DateTime date)
         {
-            try
-            {
+            //try
+            //{
                 var result = await _shipperService.GetTotalAmountEarnedByShipperOnDateAsync(date);
 
                 if (result == null || !result.Any())
                     return NotFound("No shipper earnings found for the specified date.");
 
                 return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return StatusCode(500, $"Internal server error: {ex.Message}");
+            //}
         }
 
         [Authorize(Roles="Admin,Shipper")]

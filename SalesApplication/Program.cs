@@ -119,9 +119,9 @@ namespace SalesApplication
 
             app.UseCors("AllowAll");
 
-            app.UseStaticFiles(); // Serve static files from wwwroot
-
             app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
+            app.UseStaticFiles(); // Serve static files from wwwroot
 
             app.UseHttpsRedirection();
 

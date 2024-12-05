@@ -10,6 +10,6 @@ namespace SalesApplication.Dto
 
         public int RegionId { get; set; }
 
-        public virtual Region Region { get; set; } = null!;
+        //public virtual Region Region { get; set; } = null!;
     }
 }

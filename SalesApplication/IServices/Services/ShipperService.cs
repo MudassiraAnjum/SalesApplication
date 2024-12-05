@@ -19,8 +19,8 @@ namespace SalesApplication.IServices.Services
         //Shipper Post
         public async Task<ResponseShipperDto> CreateShipper(ShipperDto shipperDto)
         {
-            try
-            {
+            //try
+            //{
                 var createShipper= _mapper.Map<Shipper>(shipperDto);
 
                 await _context.Shippers.AddAsync(createShipper);
@@ -28,39 +28,39 @@ namespace SalesApplication.IServices.Services
                 await _context.SaveChangesAsync();
 
                 return _mapper.Map<ResponseShipperDto>(createShipper);
-            }
-            catch (DbUpdateException dbEx)
-            {
-                throw new Exception("A database error occurred while saving the shipper. Please ensure all data is valid.", dbEx);
-            }
-            catch (AutoMapperMappingException mapEx)
-            {
-                throw new Exception("An error occurred during the mapping process. Please check the DTO and entity mapping configuration.", mapEx);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred. Please contact support.", ex);
-            }
+            //}
+            //catch (DbUpdateException dbEx)
+            //{
+            //    throw new Exception("A database error occurred while saving the shipper. Please ensure all data is valid.", dbEx);
+            //}
+            //catch (AutoMapperMappingException mapEx)
+            //{
+            //    throw new Exception("An error occurred during the mapping process. Please check the DTO and entity mapping configuration.", mapEx);
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("An unexpected error occurred. Please contact support.", ex);
+            //}
         }
 
         //Shipper Get
         public async Task<List<ResponseShipperDto>> GetAllShipper()
         {
-            try
-            {
+            //try
+            //{
                 var shippers = await _context.Shippers.ToListAsync();
                 return _mapper.Map<List<ResponseShipperDto>>(shippers);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching all shippers.", ex);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("An error occurred while fetching all shippers.", ex);
+            //}
         }
 
         public async Task<List<ShipperEarningsDto>> GetTotalAmountEarnedByShipperOnDateAsync(DateTime date)
         {
-            try
-            {
+            //try
+            //{
                 var shipperEarnings = await _context.OrderDetails
                     .Include(od => od.Order)
                     .ThenInclude(o => o.ShipViaNavigation) // Include Shipper details
@@ -77,17 +77,17 @@ namespace SalesApplication.IServices.Services
                     .ToListAsync();
 
                 return shipperEarnings;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching total earnings for shippers on the specified date.", ex);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("An error occurred while fetching total earnings for shippers on the specified date.", ex);
+            //}
         }
 
         public async Task UpdateShipperAsync(int shipperId, JsonPatchDocument<ShipperUpdateDto> patchDoc)
         {
-            try
-            {
+            //try
+            //{
                 var shipper = await _context.Shippers
                     .FirstOrDefaultAsync(s => s.ShipperId == shipperId);
 
@@ -121,11 +121,11 @@ namespace SalesApplication.IServices.Services
 
                 // Save changes to the database
                 await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while updating the shipper details.", ex);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("An error occurred while updating the shipper details.", ex);
+            //}
         }
     }
 }

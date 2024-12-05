@@ -19,7 +19,7 @@ namespace SalesApplication.Controllers
             //i = new EmployeeService();
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
