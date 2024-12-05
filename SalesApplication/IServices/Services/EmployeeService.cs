@@ -18,8 +18,6 @@ namespace SalesApplication.IServices.Services
 
         public async Task<EmployeeDto> DeleteEmployee(int id)
         {
-            //try
-            //{
                 // Find the employee by id
                 var deleteEmp = await _context.Employees.FindAsync(id);
 
@@ -34,25 +32,10 @@ namespace SalesApplication.IServices.Services
                 // Save changes to the database
                 await _context.SaveChangesAsync();
                 return _mapper.Map<EmployeeDto>(deleteEmp);
-            //}
-            //catch (KeyNotFoundException ex)
-            //{
-            //    throw new InvalidOperationException($"Deletion failed: {ex.Message}");
-            //}
-            //catch (DbUpdateException ex)
-            //{
-            //    throw new InvalidOperationException("An error occurred while updating the database. Please try again later.", ex);
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new InvalidOperationException("An unexpected error occurred. Please try again later.", ex);
-            //}
         }
 
         public async Task<EmployeeDto> GetLowestSaleByEmpInYearAsync(int year)
         {
-            //try
-            //{
                 var sales = await _context.OrderDetails
                 .Include(od => od.Order)
                     .Where(od => od.Order.OrderDate.HasValue && od.Order.OrderDate.Value.Year == year)
@@ -72,18 +55,10 @@ namespace SalesApplication.IServices.Services
 
                 var employee = await _context.Employees.FindAsync(sales.EmployeeId);
                 return _mapper.Map<EmployeeDto>(employee);
-            //}
-
-            //catch (Exception ex)
-            //{
-            //    throw new Exception("An error occurred while fetching the employee with the lowest sale in the specified year.", ex);
-            //}
         }
 
         public async Task<List<EmployeeSalesDto>> GetSalesMadeByEmployeeBetweenDatesAsync(int employeeId, DateTime fromDate, DateTime toDate)
         {
-            //try
-            //{
                 var salesData = await _context.Orders
                     .Include(o => o.ShipViaNavigation) // Include Shipper details to get CompanyName
                     .Where(o => o.EmployeeId == employeeId &&
@@ -97,11 +72,6 @@ namespace SalesApplication.IServices.Services
                     .ToListAsync();
 
                 return salesData;
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new Exception("An error occurred while fetching sales data for the employee.", ex);
-            //}
         }
 
 

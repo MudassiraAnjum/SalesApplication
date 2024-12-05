@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SalesApplication.Dto;
 using SalesApplication.IServices;
+using System.Security.Claims;
 
 namespace SalesApplication.Controllers
 {
@@ -29,28 +30,52 @@ namespace SalesApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllShipper()
         {
-            var getAll = await _shipperService.GetAllShipper();
-            return Ok(getAll);
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userName = User.Identity?.Name;
+
+            if (userRole == "Shipper")
+            {
+                // Fetch only the logged-in shipper's details
+                var shipper = await _shipperService.GetShipperByCompanyName(userName);
+
+                if (shipper == null)
+                {
+                    return NotFound("No details found for the logged-in shipper.");
+                }
+
+                return Ok(shipper);
+            }
+
+            // If Admin, fetch all shippers
+            var allShippers = await _shipperService.GetAllShipper();
+            return Ok(allShippers);
         }
+
 
         [Authorize(Roles = "Admin,Shipper")]
         [HttpGet("totalamountearnedbyshipper/{date}")]
         public async Task<IActionResult> GetTotalAmountEarnedByShipperOnDateAsync(DateTime date)
         {
-            //try
-            //{
-                var result = await _shipperService.GetTotalAmountEarnedByShipperOnDateAsync(date);
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userName = User.Identity?.Name;
 
-                if (result == null || !result.Any())
-                    return NotFound("No shipper earnings found for the specified date.");
+            if (userRole == "Shipper")
+            {
+                var earnings = await _shipperService.GetEarningsByShipperAndDateAsync(userName, date);
 
-                return Ok(result);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(500, $"Internal server error: {ex.Message}");
-            //}
+                if (earnings == null || !earnings.Any())
+                {
+                    return NotFound("No sales made by the logged-in shipper on the specified date.");
+                }
+
+                return Ok(earnings);
+            }
+
+            // If Admin, fetch all earnings
+            var allEarnings = await _shipperService.GetTotalAmountEarnedByShipperOnDateAsync(date);
+            return Ok(allEarnings);
         }
+
 
         [Authorize(Roles="Admin,Shipper")]
         [HttpPatch("edit/{shipperId}")]
@@ -59,10 +84,34 @@ namespace SalesApplication.Controllers
             if (patchDoc == null)
             {
                 return BadRequest("Invalid input data.");
-            }           
+            }
+
+            // Get the logged-in user's role and username
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userName = User.Identity?.Name;  // Assuming userName is the CompanyName for the Shipper role
+
+            // If the logged-in user is a shipper, check if the user is trying to update their own data
+            if (userRole == "Shipper" && userName != null)
+            {
+                // Fetch the shipper data by shipperId to compare
+                var shipper = await _shipperService.GetShipperById(shipperId);
+
+                if (shipper == null)
+                {
+                    return NotFound("Shipper not found.");
+                }
+
+                // Ensure the logged-in shipper can only update their own data
+                if (shipper.CompanyName != userName)
+                {
+                    return Forbid("You cannot update another shipper's data.");
+                }
+            }
+
             // Call the service to update the shipper with the patch document
             await _shipperService.UpdateShipperAsync(shipperId, patchDoc);
             return NoContent(); // Success, no content to return
+
         }
 
     }
