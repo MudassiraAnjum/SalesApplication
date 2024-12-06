@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 600px; /* Increased width for better layout */
+            max-height: 80vh; /* Set a maximum height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #ff5722; /* Orange color for subheadings */
+            margin: 15px 0 10px; /* Margin for spacing */
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #2a2a2a; /* Darker input background */
+            color: #fff; /* White text in inputs */
+        }
+
+            input[type="text"]:focus, input[type="date"]:focus {
+                border-color: #ff5722; /* Orange border on focus */
+                outline: none; /* Remove default outline */
+            }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+
+        .reset-button {
+            background-color: #555; /* Gray color for reset buttons */
+        }
+
+            .reset-button:hover {
+                background-color: #777; /* Darker gray on hover */
+            }
+
+        .response {
+            margin-top: 15px;
+            color: #ff5722; /* Orange color for response messages */
+            text-align: left; /* Align text to the left */
+            display: none; /* Initially hidden */
+        }
+
+        .loading {
+            color: #ff5722; /* Orange color for loading message */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Management</h1>
+
+        <!-- Get Employees by Region -->
+        <div class="endpoint">
+            <h2>Get Employees by Region</h2>
+            <input type="text" id="regionDescription" placeholder="Enter Region Description">
+            <button id="getEmployeesByRegion">Get Employees</button>
+            <button class="reset-button" id="resetRegion">Reset</button>
+            <div class="response" id="employeesByRegionList"></div>
+        </div>
+
+        <!-- Get Employees by Hire Date -->
+        <div class="endpoint">
+            <h2>Get Employees by Hire Date</h2>
+            <input type="date" id="hireDate">
+            <button id="getEmployeesByHireDate">Get Employees</button>
+            <button class="reset-button" id="resetHireDate">Reset</button>
+            <div class="response" id="employeesByHireDateList"></div>
+        </div>
+
+        <!-- Get Lowest Sale by Employee on Date -->
+        <div class="endpoint">
+            <h2>Get Lowest Sale by Employee on Date</h2>
+            <input type="date" id="saleDate">
+            <button id="getLowestSale">Get Lowest Sale</button>
+            <button class="reset-button" id="resetLowestSale">Reset</button>
+            <div class="response" id="lowestSaleList"></div>
+            </ ```html
+        </div>
+
+        <!-- Get Employees with Birthday on Specific Date -->
+        <div class="endpoint">
+            <h2>Get Employees with Birthday on Date</h2>
+            <input type="date" id="birthdayDate">
+            <button id="getBirthdaysOnDate">Get Birthdays</button>
+            <button class="reset-button" id="resetBirthdays">Reset</button>
+            <div class="response" id="birthdaysOnDateList"></div>
+        </div>
+
+        <!-- Get All Employees -->
+        <div class="endpoint">
+            <h2>Get All Employees</h2>
+            <button id="getAllEmployees">Get All Employees</button>
+            <button class="reset-button" id="resetAllEmployees">Reset</button>
+            <div class="response" id="allEmployeesList"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Clear previous results
+            function clearResults() {
+                $('.response').html('').hide();
+            }
+
+            // Reset all inputs and results
+            function resetFields() {
+                $('input[type="text"], input[type="date"]').val('');
+                clearResults();
+            }
+
+            // Show loading message
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading ...</div>').show();
+            }
+
+            // Hide loading message
+            function hideLoading(selector) {
+                $(selector).hide();
+            }
+
+            // Get Employees by Region
+            $('#getEmployeesByRegion').click(function () {
+                clearResults();
+                const region = $('#regionDescription').val();
+                if (!region) {
+                    $('#employeesByRegionList').html('Please enter a region description.').show();
+                    return;
+                }
+                showLoading('#employeesByRegionList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/employee/by-region/${encodeURIComponent(region)}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include token in the request header
+                    },
+                    success: function (data) {
+                        hideLoading('#employeesByRegionList');
+                        $('#employeesByRegionList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#employeesByRegionList');
+                        $('#employeesByRegionList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+            // Get Employees by Hire Date
+            $('#getEmployeesByHireDate').click(function () {
+                clearResults();
+                const hireDate = $('#hireDate').val();
+                if (!hireDate) {
+                    $('#employeesByHireDateList').html('Please select a hire date.').show();
+                    return;
+                }
+                showLoading('#employeesByHireDateList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/employee/by-hire-date/${hireDate}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include token in the request header
+                    },
+                    success: function (data) {
+                        hideLoading('#employeesByHireDateList');
+                        $('#employeesByHireDateList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#employeesByHireDateList');
+                        $('#employeesByHireDateList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+            // Get Lowest Sale by Employee on Date
+            $('#getLowestSale').click(function () {
+                clearResults();
+                const saleDate = $('#saleDate').val();
+                if (!saleDate) {
+                    $('#lowestSaleList').html('Please select a sale date.').show();
+                    return;
+                }
+                showLoading('#lowestSaleList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/employee/lowest-sale/${saleDate}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include token in the request header
+                    },
+                    success: function (data) {
+                        hideLoading('#lowestSaleList');
+                        $('#lowestSaleList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#lowestSaleList');
+                        $('#lowestSaleList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+            // Get Employees with Birthday on Specific Date
+            $('#getBirthdaysOnDate').click(function () {
+                clearResults();
+                const birthdayDate = $('#birthdayDate').val();
+                if (!birthdayDate) {
+                    $('#birthdays OnDateList').html('Please select a birthday date.').show();
+                    return;
+                }
+                showLoading('#birthdaysOnDateList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/employee/birthday-by-date/${birthdayDate}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include token in the request header
+                    },
+                    success: function (data) {
+                        hideLoading('#birthdaysOnDateList');
+                        $('#birthdaysOnDateList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#birthdaysOnDateList');
+                        $('#birthdaysOnDateList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+            // Get All Employees
+            $('#getAllEmployees').click(function () {
+                clearResults();
+                showLoading('#allEmployeesList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/employee/All-Employees`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}` // Include token in the request header
+                    },
+                    success: function (data) {
+                        hideLoading('#allEmployeesList');
+                        $('#allEmployeesList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#allEmployeesList');
+                        $('#allEmployeesList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+            // Reset button functionality
+            $('.reset-button').click(function () {
+                resetFields();
+            });
+
+            // Function to format the response for display
+            function formatResponse(data) {
+                if (!data || data.length === 0) {
+                    return 'No results found.';
+                }
+                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+            }
+        });
+    </script>
+</body>
+</html>

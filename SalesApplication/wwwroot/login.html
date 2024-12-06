@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            transition: transform 0.3s ease;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .welcome h1 {
+                color: #ff5722; /* Orange color */
+                margin: 0;
+            }
+
+            .welcome p {
+                color: #fff; /* White text for description */
+                margin: 5px 0;
+            }
+
+        .container:hover {
+            transform: scale(1.02); /* Slightly enlarge on hover */
+        }
+
+        h2 {
+            text-align: center;
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"] {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #2a2a2a; /* Darker input background */
+            color: #fff; /* White text in inputs */
+        }
+
+            input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+                border-color: #ff5722; /* Orange border on focus */
+                outline: none; /* Remove default outline */
+            }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            color: #ff5722; /* Orange color */
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 10px;
+            color: #fff; /* White text for the link */
+        }
+
+            .register-link a {
+                color: #ff5722; /* Orange color for the link */
+                text-decoration: none; /* Remove underline */
+            }
+
+                .register-link a:hover {
+                    text-decoration: underline; /* Underline on hover */
+                }
+    </style>
+</head>
+<body>
+
+    <div class="welcome">
+        <h1>Welcome to Sales Application</h1>
+        <p>Your single tool for sales management</p>
+    </div>
+
+    <div class="container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="loginBtn">Login</button>
+        <div class="register-link">
+            <p>If you are a new shipper, <a href="#" id="showRegister">register here</a></p>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="container" id="registerContainer" style="display:none;">
+        <h2>Register Shipper</h2>
+        <input type="text" id="companyName" placeholder="Company Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Password" required>
+        <button id="registerBtn">Register</button>
+        <div class="message" id="registerMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', function () {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('api/Auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.token) {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('role', data.role); // Fixed the space in the key
+                        window.location.href = `/${data.role.toLowerCase()}management.html`; // Redirect based on role
+                    } else {
+                        document.getElementById('message').innerText = 'Invalid username or password';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('showRegister').addEventListener('click', function () {
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('registerContainer').style.display = 'block';
+        });
+
+        document.getElementById('registerBtn').addEventListener('click', async (event) => {
+            event.preventDefault();
+            const companyName = document.getElementById("companyName").value; // Corrected ID
+            const email = document.getElementById("email").value; // Corrected ID
+            const password = document.getElementById("registerPassword").value; // Corrected ID
+
+            try {
+                const response = await fetch('api/Auth/register', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ companyName, email, password })
+                });
+
+                if (response.ok) {
+                    document.getElementById("registerMessage").textContent = "Registration successful. Redirecting to login...";
+                    setTimeout(() => {
+                        document.getElementById('registerContainer').style.display = 'none'; // Hide registration form
+                        document.querySelector('.container').style.display = 'block'; // Show login form
+                        document.getElementById("registerMessage").textContent = ""; // Clear message
+                    }, 2000);
+                } else {
+                    const error = await response.text();
+                    document.getElementById("registerMessage").textContent = `Error: ${error}`;
+                }
+            } catch (error) {
+                document.getElementById("registerMessage").textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+
+</body>
+</html>

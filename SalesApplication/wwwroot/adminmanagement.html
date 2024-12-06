@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin Management</h1>
+        <button id="employeeBtn">Go to Employee</button>
+        <button id="orderBtn">Go to Order</button>
+        <button id="orderDetailsBtn">Go to Order Details</button>
+        <button id="shipperBtn">Go to Shipper</button>
+        <button id="territoryBtn">Go to Territory</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script>
+        document.getElementById('employeeBtn').addEventListener('click', function () {
+            window.location.href = 'j_employee.html'; // Redirect to employee.html
+        });
+
+        document.getElementById('orderBtn').addEventListener('click', function () {
+            window.location.href = 'j_order.html'; // Redirect to order.html
+        });
+
+        document.getElementById('orderDetailsBtn').addEventListener('click', function () {
+            window.location.href = 'j_orderdetails.html'; // Redirect to orderdetails.html
+        });
+
+        document.getElementById('shipperBtn').addEventListener('click', function () {
+            window.location.href = 'j_shipper.html'; // Redirect to shipper.html
+        });
+
+        document.getElementById('territoryBtn').addEventListener('click', function () {
+            window.location.href = 'j_territory.html'; // Redirect to territory.html
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('token'); // Remove token from local storage
+            localStorage.removeItem('role'); // Remove role from local storage
+            window.location.href = 'login.html'; // Redirect to login page
+        });
+    </script>
+
+</body>
+</html>
