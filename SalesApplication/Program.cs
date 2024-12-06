@@ -1,13 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SalesApplication.Data;
 using SalesApplication.IServices.Services;
 using SalesApplication.IServices;
 using SalesApplication.Mapper;
 using SalesApplication.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.OpenApi.Models;
 
 namespace SalesApplication
 {
@@ -17,69 +17,54 @@ namespace SalesApplication
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddDbContext<ApplicationDbContext>(db => db.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddAutoMapper(typeof(SalesMapping));
-            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-            builder.Services.AddScoped<ITerritoryService, TerritoryService>();
-            builder.Services.AddScoped<IShipperService, ShipperService>();
-            builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<AuthService>();
-
-            builder.Services.AddControllers().AddNewtonsoftJson();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Add DbContext to the container
+            builder.Services.AddDbContext<ApplicationDbContext>(db =>
+                db.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add JWT Authentication
-            var secretKey = builder.Configuration["Jwt:Key"];
-            var issuer = builder.Configuration["Jwt:Issuer"];
-            var audience = builder.Configuration["Jwt:Audience"];
-
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-                    ClockSkew = TimeSpan.Zero // Optional: Set this to 0 if you want to avoid time-based errors for token expiration
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnAuthenticationFailed = context =>
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        Console.WriteLine("Authentication failed: " + context.Exception.Message);
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        Console.WriteLine("Token is valid");
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
 
+            // Add AutoMapper
+            builder.Services.AddAutoMapper(typeof(SalesMapperProfile));
+
+            // Add application services
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ITerritoryService, TerritoryService>();
+            builder.Services.AddScoped<IShipperService, ShipperService>();
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailsService>();
+            builder.Services.AddScoped<AuthService>();
+
+            // Add controllers with JSON support
+            builder.Services.AddControllers().AddNewtonsoftJson();
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
+
+            // Configure CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
+                options.AddPolicy("AllowAllOrigins", policyBuilder =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policyBuilder.AllowAnyOrigin()
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader();
                 });
             });
 
-            builder.Services.AddAuthorization();
-
+            // Add Swagger with JWT support
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -90,47 +75,43 @@ namespace SalesApplication
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Enter 'your_token_here'"
+                    Description = "Enter 'Bearer [space] your_token_here'"
                 });
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
+                    new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
             });
 
             var app = builder.Build();
 
+            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("AllowAll");
-
-            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-
-            app.UseStaticFiles(); // Serve static files from wwwroot
-
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAllOrigins");
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

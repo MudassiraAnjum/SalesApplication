@@ -4,9 +4,9 @@ using SalesApplication.Models;
 
 namespace SalesApplication.Mapper
 {
-    public class SalesMapping:Profile
+    public class SalesMapperProfile:Profile
     {
-        public SalesMapping()
+        public SalesMapperProfile()
         {
             CreateMap<Employee, EmployeeDto>().ReverseMap();
             CreateMap<Territory, TerritoryDto>().ReverseMap();
