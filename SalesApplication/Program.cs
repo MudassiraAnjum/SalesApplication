@@ -47,9 +47,12 @@ namespace SalesApplication
             builder.Services.AddScoped<ITerritoryService, TerritoryService>();
             builder.Services.AddScoped<IShipperService, ShipperService>();
             builder.Services.AddScoped<IOrderDetailsService, OrderDetailsService>();
+            builder.Services.AddScoped<AuthService>();
 
             // Add controllers with JSON support
             builder.Services.AddControllers().AddNewtonsoftJson();
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
 
             // Configure CORS
             builder.Services.AddCors(options =>
