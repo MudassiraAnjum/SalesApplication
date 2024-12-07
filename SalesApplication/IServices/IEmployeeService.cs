@@ -8,6 +8,8 @@ namespace SalesApplication.IServices
         Task<ResponseEmployeeDto> GetHighestSaleByEmployeeInYearAsync(int year);
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByCityAsync(string city);
         Task<ResponseEmployeeDto> PatchEmployeeAsync(int employeeId, JsonPatchDocument<EmployeeDto> patchDoc);
+        //Task<ResponseEmployeeDto> AddEmployeeAsync(EmployeeDto employeeDto);
+
 
     }
 }

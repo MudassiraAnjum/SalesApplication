@@ -75,6 +75,18 @@ namespace SalesApplication.IServices.Services
             // Map the updated entity to a response DTO
             return _mapper.Map<ResponseEmployeeDto>(employee);
         }
+        //public async Task<ResponseEmployeeDto> AddEmployeeAsync(EmployeeDto employeeDto)
+        //{
+        //    // Map DTO to Entity
+        //    var employee = _mapper.Map<Employee>(employeeDto);
+
+        //    // Add the entity to the database
+        //    await _context.Employees.AddAsync(employee);
+        //    await _context.SaveChangesAsync();
+
+        //    // Map the saved entity back to a response DTO
+        //    return _mapper.Map<ResponseEmployeeDto>(employee);
+        //}
 
 
     }

@@ -46,5 +46,17 @@ namespace SalesApplication.Controllers
             }
             return Ok(updatedEmployee);
         }
+        //[Authorize(Roles = "Admin,Employee")]
+        //[HttpPost]
+        //public async Task<IActionResult> AddEmployee([FromBody] EmployeeDto employeeDto)
+        //{
+        //    if (employeeDto == null)
+        //    {
+        //        return BadRequest("Employee data cannot be null.");
+        //    }
+
+        //    var createdEmployee = await _employeeService.AddEmployeeAsync(employeeDto);
+        //    return CreatedAtAction(nameof(GetEmployeesByCity), new { city = createdEmployee.City }, createdEmployee);
+        //}
     }
 }
