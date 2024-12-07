@@ -15,6 +15,11 @@ namespace SalesApplication.Mapper
             CreateMap<ResponseShipperDto, Shipper>().ReverseMap();
             CreateMap<Shipper, ShipperUpdateDto>().ReverseMap();
             //CreateMap<Order,OrderDto>().ReverseMap();
+            CreateMap<ResponseEmployeeDto, Employee>().ReverseMap(); 
+            CreateMap<Territory, TerritoryDto>().ReverseMap();
+            CreateMap<Employee, EmployeeSalesDto>().ReverseMap();
+            CreateMap<Employee, EmployeeDto>().ReverseMap();
+
         }
     }
 }
