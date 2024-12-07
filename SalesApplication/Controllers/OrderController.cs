@@ -17,22 +17,25 @@ namespace SalesApplication.Controllers
             _orderService = orderService;
         }
 
+
         [Authorize(Roles = "Admin,Employee")]
 
         [HttpGet("BetweenDate/{fromDate}/{toDate}")]
         public IActionResult GetShipDetailsBetweenDates(DateTime fromDate, DateTime toDate)
         {
+
             var results = _orderService.GetShipDetailsBetweenDates(fromDate, toDate);
             return Ok(results);
+            
         }
-
         [Authorize(Roles = "Admin,Employee")]
-
         [HttpGet("allshipdetails")]
         public IActionResult GetAllShipDetails()
         {
+            
             var results = _orderService.GetAllShipDetails();
             return Ok(results);
+           
         }
 
         [Authorize(Roles = "Admin,Employee")]

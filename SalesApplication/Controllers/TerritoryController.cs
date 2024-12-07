@@ -23,15 +23,9 @@ namespace SalesApplication.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateTerritory([FromBody] TerritoryCreateDto territoryCreateDto)
         {
-            try
-            {
-                var result = await _territoryService.CreateTerritoryAsync(territoryCreateDto);
-                return Ok(result);
-            }
-            catch (System.Exception)
-            {
-                return StatusCode(500, "An error occurred while creating the territory.");
-            }
+            var result = await _territoryService.CreateTerritoryAsync(territoryCreateDto);
+            return Ok(result);
+            
         }
 
         [Authorize(Roles = "Admin")]
@@ -40,23 +34,18 @@ namespace SalesApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<List<TerritoryResponseDto>>> GetAllTerritories()
         {
-            try
-            {
-                var territories = await _territoryService.GetAllTerritoriesAsync();
+            var territories = await _territoryService.GetAllTerritoriesAsync();
 
-                // Trim any leading or trailing spaces from territoryDescription and regionName
-                foreach (var territory in territories)
-                { 
-                    territory.TerritoryDescription = territory.TerritoryDescription?.Trim();
-                    territory.RegionName = territory.RegionName?.Trim();  // Trim regionName as well
-                }
-
-                return Ok(territories);
-            }
-            catch (System.Exception)
+            // Trim any leading or trailing spaces from territoryDescription and regionName
+            foreach (var territory in territories)
             {
-                return StatusCode(500, "An error occurred while fetching the territories.");
+                territory.TerritoryDescription = territory.TerritoryDescription?.Trim();
+                territory.RegionName = territory.RegionName?.Trim();  // Trim regionName as well
             }
+
+            return Ok(territories);
+
+            
         }
 
     }

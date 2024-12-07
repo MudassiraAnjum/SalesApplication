@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipper Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #4facfe;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .endpoint {
+            margin-bottom: 25px;
+        }
+
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #4facfe;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+            input[type="date"]:focus, input[type="number"]:focus {
+                border-color: #00f2fe;
+                box-shadow: 0 0 10px rgba(0, 243, 254, 0.5);
+            }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4facfe;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            button:hover {
+                background: #00f2fe;
+            }
+
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f2f2f2;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #4facfe;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 16px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shipper Management</h1>
+
+        <!-- Total Earnings by Shipper (Specific Date) -->
+        <div class="endpoint">
+            <h2>Total Earnings by Shipper (Specific Date)</h2>
+            <input type="date" id="earningsDate" placeholder="Select Date">
+            <button id="getEarningsByDateButton">Get Earnings</button>
+            <div class="response" id="earningsByDateResponse"></div>
+        </div>
+
+        <!-- Total Earnings by Shipper (Specific Year) -->
+        <div class="endpoint">
+            <h2>Total Earnings by Shipper (Specific Year)</h2>
+            <input type="number" id="earningsYear" placeholder="Enter Year (e.g., 2023)">
+            <button id="getEarningsByYearButton">Get Earnings</button>
+            <div class="response" id="earningsByYearResponse"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Helper functions
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading ...</div>').show();
+            }
+
+            function hideLoading(selector) {
+                $(selector).hide();
+            }
+
+            function showError(selector, message) {
+                $(selector).html(`<div class="error">${message}</div>`).show();
+            }
+
+            function formatResponse(selector, data) {
+                $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>').show();
+            }
+
+            function getAuthToken() {
+                return localStorage.getItem('authToken'); // Retrieve JWT token from localStorage
+            }
+
+            // Fetch total earnings by specific date
+            $('#getEarningsByDateButton').click(function () {
+                const date = $('#earningsDate').val();
+                if (!date) {
+                    showError('#earningsByDateResponse', 'Please select a valid date.');
+                    return;
+                }
+
+                showLoading('#earningsByDateResponse');
+                $.ajax({
+                    url: `/api/shipper/totalamountearnedbyshipper/${date}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    success: function (data) {
+                        hideLoading('#earningsByDateResponse');
+                        formatResponse('#earningsByDateResponse', data);
+                    },
+                    error: function (err) {
+                        hideLoading('#earningsByDateResponse');
+                        showError('#earningsByDateResponse', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                });
+            });
+
+            // Fetch total earnings by specific year
+            $('#getEarningsByYearButton').click(function () {
+                const year = $('#earningsYear').val();
+                if (!year || year <= 0) {
+                    showError('#earningsByYearResponse', 'Please enter a valid year.');
+                    return;
+                }
+
+                showLoading('#earningsByYearResponse');
+                $.ajax({
+                    url: `/api/shipper/totalamountearnedbyshipper/${year}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    success: function (data) {
+                        hideLoading('#earningsByYearResponse');
+                        formatResponse('#earningsByYearResponse', data);
+                    },
+                    error: function (err) {
+                        hideLoading('#earningsByYearResponse');
+                        showError('#earningsByYearResponse', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

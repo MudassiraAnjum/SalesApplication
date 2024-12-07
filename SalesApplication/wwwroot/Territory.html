@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Territory Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #3498db;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .endpoint {
+            margin-bottom: 30px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+            input[type="text"]:focus, input[type="number"]:focus {
+                border-color: #2980b9;
+                box-shadow: 0 0 8px rgba(41, 128, 185, 0.5);
+            }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            button:hover {
+                background: #2980b9;
+            }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #ecf0f1;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #3498db;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .success {
+            color: #2ecc71;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Territory Management</h1>
+
+        <!-- Get All Territories -->
+        <div class="endpoint">
+            <h2>Get All Territories</h2>
+            <button id="getAllTerritoriesButton">Get Territories</button>
+            <div class="response" id="territoriesList"></div>
+        </div>
+
+        <!-- Create Territory -->
+        <div class="endpoint">
+            <h2>Create Territory</h2>
+            <input type="text" id="territoryId" placeholder="Enter Territory ID">
+            <input type="text" id="territoryDescription" placeholder="Enter Territory Description">
+            <input type="text" id="regionId" placeholder="Enter Region ID">
+            <button id="createTerritoryButton">Create Territory</button>
+            <div class="response" id="createResponse"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Show loading message
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading...</div>').show();
+            }
+
+            // Hide loading message
+            function hideLoading(selector) {
+                $(selector).hide();
+            }
+
+            // Display error message
+            function showError(selector, message) {
+                $(selector).html(`<div class="error">${message}</div>`).show();
+            }
+
+            // Display success message
+            function showSuccess(selector, message) {
+                $(selector).html(`<div class="success">${message}</div>`).show();
+            }
+
+            // Display formatted response
+            function formatResponse(selector, data) {
+                $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>').show();
+            }
+
+            // Get JWT token from localStorage
+            function getAuthToken() {
+                return localStorage.getItem('authToken'); // Retrieve JWT from localStorage
+            }
+
+            // Get All Territories
+            $('#getAllTerritoriesButton').click(function () {
+                showLoading('#territoriesList');
+                $.ajax({
+                    url: '/api/territory', // Your GET endpoint for all territories
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    success: function (data) {
+                        hideLoading('#territoriesList');
+                        if (data && data.length > 0) {
+                            formatResponse('#territoriesList', data);
+                        } else {
+                            showError('#territoriesList', 'No territories found.');
+                        }
+                    },
+                    error: function (err) {
+                        hideLoading('#territoriesList');
+                        showError('#territoriesList', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                });
+            });
+
+            // Create Territory
+            $('#createTerritoryButton').click(function () {
+                const territoryId = $('#territoryId').val();
+                const territoryDescription = $('#territoryDescription').val();
+                const regionId = $('#regionId').val();
+
+                if (!territoryId || !territoryDescription || !regionId) {
+                    showError('#createResponse', 'Please fill in all fields.');
+                    return;
+                }
+
+                showLoading('#createResponse');
+                const territoryData = {
+                    TerritoryId: territoryId,
+                    TerritoryDescription: territoryDescription,
+                    RegionId: regionId
+                };
+
+                $.ajax({
+                    url: '/api/territory', // POST endpoint for creating a territory
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify(territoryData),
+                    success: function (data) {
+                        hideLoading('#createResponse');
+                        showSuccess('#createResponse', 'Territory created successfully.');
+                    },
+                    error: function (err) {
+                        hideLoading('#createResponse');
+                        showError('#createResponse', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                }); 
+            });
+        });
+    </script>
+</body>
+</html>

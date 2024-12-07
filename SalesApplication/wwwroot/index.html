@@ -1,0 +1,394 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Styles */
+        body {
+            margin: 0;  
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            color: #f9d342;
+        }
+
+        p {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            color: #eeeeee;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+            ul li {
+                margin: 0;
+            }
+
+            ul a {
+                text-decoration: none;
+                font-size: 1.2rem;
+                font-weight: 500;
+                padding: 10px 20px;
+                border-radius: 25px;
+                color: white;
+                background-color: #2575fc;
+                transition: all 0.3s ease;
+            }
+
+                ul a:hover {
+                    background-color: #f9d342;
+                    color: #2575fc;
+                    transform: scale(1.1);
+                }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.9rem;
+            color: #cccccc;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome To <span class="highlight">Sales Application</span></h1>
+        <p>Streamline Your Sales Workflow With Ease</p>
+        <ul>
+            <li><a href="Auth.html">Authentication</a></li>
+            <li><a href="emp.html">Employee</a></li>
+            <li><a href="Order.html">Orders</a></li>
+            <li><a href="Shipper.html">Shipper</a></li>
+            <li><a href="Territory.html">Territory</a></li>
+        </ul>
+    </div>
+    <footer>
+        <p>&copy; 2024 Sales Application. All rights reserved.</p>
+    </footer>
+    <script>
+        // JavaScript
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Sales Application is ready!");
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome To Sales Application</h1>
+        <ul>
+            <li><a href="Auth.html">Authentication</a></li>
+            <li><a href="emp.html">Employee</a></li>
+            <li><a href="Order.html">Orders</a></li>
+            <li><a href="Shipper.html">Shipper</a></li>
+            <li><a href="Territory.html">Territory</a></li>
+        </ul>
+        <div class="response-text" style="text-align: center;">
+            Streamline Your Sales Workflow With Ease.
+</div>
+    </div>
+</body>
+</html>-->
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Application</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #444;
+            padding: 10px;
+        }
+
+            nav a {
+                color: white;
+                margin: 0 15px;
+                text-decoration: none;
+                font-size: 16px;
+            }
+
+                nav a:hover {
+                    text-decoration: underline;
+                }
+
+        .container {
+            padding: 40px 20px;
+            text-align: center;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .form-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .auth-status {
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        .input-field {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sales Application</h1>
+    </header>
+    <nav>
+        <a href="Auth.html">Register Shipper</a>
+        <a href="emp.html">Employee</a>
+        <a href="Orders.html">Orders</a>
+        <a href="Shipper.html">Shipper</a>
+        <a href="Territory.html">Territory</a>
+    </nav>
+
+
+    <div class="container">
+        <h2>Welcome to the Sales Application</h2>
+        <p>Select a module from the navigation bar or log in to access more features.</p>
+
+        <div id="auth-status" class="auth-status"></div>
+
+        <div class="button-container">
+            <button id="register-btn">Register</button>
+            <button id="login-btn" style="display:none;">Login</button>
+            <button id="logout-btn" style="display:none;">Logout</button>
+        </div>
+
+        <div id="register-form" class="form-container">
+            <h3>Register</h3>
+            <input type="text" id="register-CompanyName" class="input-field" placeholder="Company Name" required><br>
+
+            <input type="text" id="register-Email" class="input-field" placeholder="Email" required><br>
+            <input type="password" id="register-password" class="input-field" placeholder
+            <a href="Auth.html">Auth.html</a>="Password" required><br>
+            <button id="submit-register">Register</button>
+            <div id="register-error" class="error"></div>
+        </div>
+
+        <div id="login-form" class="form-container">
+            <h3>Login</h3>
+            <input type="text" id="login-username" class="input-field" placeholder="Username" required><br>
+            <input type="password" id="login-password" class="input-field" placeholder="Password" required><br>
+            <button id="submit-login">Submit</button>
+            <div id="login-error" class="error"></div>
+        </div>
+    </div>
+
+    <script>$(document).ready(() => {
+            const apiUrl = 'https://localhost:7141/api/auth/';
+            const jwtToken = localStorage.getItem('jwtToken');
+
+            // Update UI based on login status
+            function updateUIForAuthStatus() {
+                if (jwtToken) {
+                    $('#auth-status').text('You are logged in.');
+                    $('#login-btn').hide();
+                    $('#register-btn').hide();
+                    $('#logout-btn').show();
+                } else {
+                    $('#login-btn').show();
+                    $('#register-btn').show();
+                    $('#logout-btn').hide();
+                }
+            }
+
+            updateUIForAuthStatus();
+
+          // Register button logic
+            window.location.href = '/Auth.html';
+
+            $('#submit-register').click(() => {
+                const username = $('#register-CompanyName').val().trim();
+
+
+
+                const username = $('#register-username').val().trim();
+                const password = $('#register-password').val().trim();
+                const role = $('#register-role').val().trim();
+
+                if (!username || !password || !role) {
+                    $('#register-error').text('All fields are required.');
+                    return;
+                }
+
+                $.ajax({
+                    url: apiUrl + 'register',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ username, password, CompanyName }),
+                    success: () => {
+                        alert('Registration successful! You can now login.');
+
+                        $('#register-form').hide();
+                        $('#login-form').show();
+                        $('#login-btn').show();
+                        $('#register-error').text('');
+                    },
+
+                    error: (err) => {
+                        $('#register-error').text(err.responseText || 'Registration failed');
+                    }
+                });
+            });
+
+            // Login button logic
+            $('#submit-login').click(() => {
+                const username = $('#login-username').val().trim();
+                const password = $('#login-password').val().trim();
+
+                if (!username || !password) {
+                    $('#login-error').text('All fields are required.');
+                    return;
+                }
+
+                $.ajax({
+                    url: apiUrl + 'login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ username, password }),
+                    success: (response) => {
+                        const token = response.token;
+                        localStorage.setItem('jwtToken', token);
+                        $('#login-error').text('');
+                        $('#auth-status').text(Logged in as ${username});
+                        $('#login-form').hide();
+                        updateUIForAuthStatus();
+                    },
+                    error: () => {
+                        $('#login-error').text('Invalid username or password');
+                    }
+                });
+            });
+
+            // Button to toggle registration form
+            $('#register-btn').click(() => {
+                $('#register-form').toggle();
+                $('#login-form').hide();
+            });
+
+            // Button to toggle login form
+            $('#login-btn').click(() => {
+                $('#login-form').toggle();
+                $('#register-form').hide();
+            });
+
+            // Logout button logic
+            $('#logout-btn').click(() => {
+                localStorage.removeItem('jwtToken');
+                location.reload();
+            });
+        });</script>
+</body>
+</html>-->

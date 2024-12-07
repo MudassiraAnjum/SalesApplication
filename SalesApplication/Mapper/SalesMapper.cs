@@ -22,6 +22,9 @@ namespace SalesApplication.Mapper
             CreateMap<Territory, TerritoryResponseDto>().ReverseMap();
 
             CreateMap<Shipper, ShipperEarningsResponseDto>().ReverseMap();
+            //Externally added 
+
+            CreateMap<ShipperDto, ShipperRegistrationDto>().ReverseMap();
 
             
         }

@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to the external CSS file -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Management</h1>
+
+        <!-- Get All Employees -->
+        <div class="endpoint">
+            <h2>Get All Employees</h2>
+            <button id="getAllEmployeesButton">Get Employees</button>
+            <div class="response" id="allEmployeesList"></div>
+        </div>
+
+        <!-- Get Employee's Company Sales -->
+        <div class="endpoint">
+            <h2>Get Employee's Company Sales</h2>
+            <input type="number" id="employeeId" placeholder="Enter Employee ID">
+            <button id="getEmployeeSalesButton">Get Sales</button>
+            <div class="response" id="employeeSales"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Show loading message
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading ...</div>').show();
+            }
+
+            // Hide loading message
+            function hideLoading(selector) {
+                $(selector).hide();
+            }
+
+            // Display error message
+            function showError(selector, message) {
+                $(selector).html(`<div class="error">${message}</div>`).show();
+            }
+
+            // Display formatted response
+            function formatResponse(selector, data) {
+                $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>').show();
+            }
+
+            // Get JWT token from localStorage
+            function getAuthToken() {
+                return localStorage.getItem('authToken'); // Retrieve JWT from localStorage
+            }
+
+            // Get all employees
+            $('#getAllEmployeesButton').click(function () {
+                showLoading('#allEmployeesList');
+                $.ajax({
+                    url: '/api/employee', // Your GET endpoint for all employees
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    success: function (data) {
+                        hideLoading('#allEmployeesList');
+                        if (data && data.length > 0) {
+                            formatResponse('#allEmployeesList', data);
+                        } else {
+                            showError('#allEmployeesList', 'No employees found.');
+                        }
+                    },
+                    error: function (err) {
+                        hideLoading('#allEmployeesList');
+                        showError('#allEmployeesList', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                });
+            });
+
+            // Get employee's company sales by employee ID
+            $('#getEmployeeSalesButton').click(function () {
+                const employeeId = $('#employeeId').val();
+                if (!employeeId) {
+                    showError('#employeeSales', 'Please enter a valid employee ID.');
+                    return;
+                }
+                showLoading('#employeeSales');
+                $.ajax({
+                    url: `/api/employee/companyname/${encodeURIComponent(employeeId)}`, // Your GET endpoint for employee company sales
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken() // Include JWT in Authorization header
+                    },
+                    success: function (data) {
+                        hideLoading('#employeeSales');
+                        if (data) {
+                            formatResponse('#employeeSales', data);
+                        } else {
+                            showError('#employeeSales', 'No sales data found for the employee.');
+                        }
+                    },
+                    error: function (err) {
+                        hideLoading('#employeeSales');
+                        showError('#employeeSales', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

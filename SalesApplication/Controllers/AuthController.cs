@@ -31,40 +31,24 @@ namespace SalesApplication.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while registering.");
             }
         }
-
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
-            if (string.IsNullOrWhiteSpace(loginDto.Username) || string.IsNullOrWhiteSpace(loginDto.Password))
-            {
-                return BadRequest(new { message = "Username and Password are required." });
-            }
-
             try
             {
                 var tokenModel = _authService.Authenticate(loginDto.Username, loginDto.Password);
+
+                if (tokenModel.Token == null)
+                    return Unauthorized("Invalid username or password");
+
                 return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception ex)
             {
-                return Unauthorized("Invalid username or password");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred during login: " + ex.Message);
             }
         }
-
-
-        //[HttpPost("login")]
-        //public IActionResult Login(string username, string password)
-        //{
-        //    try
-        //    {
-        //        var tokenModel = _authService.Authenticate(username, password);
-        //        return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
-        //    }
-        //    catch (UnauthorizedAccessException)
-        //    {
-        //        return Unauthorized("Invalid username or password");
-        //    }
-        //}
-
     }
 }
+
+        

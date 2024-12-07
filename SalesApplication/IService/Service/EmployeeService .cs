@@ -27,8 +27,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeCompanyResponseDto> GetEmployeeCompanySalesAsync(int employeeId)
     {
-        //try
-        //{
+        
         var employee = await _context.Employees
             .Include(e => e.Orders)
             .ThenInclude(o => o.OrderDetails)

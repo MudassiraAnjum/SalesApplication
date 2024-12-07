@@ -1,0 +1,363 @@
+﻿/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+/* Header Styles */
+h1 {
+    text-align: center;
+    color: #6C63FF;
+    margin-bottom: 25px;
+    font-size: 2.5em;
+}
+
+h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Buttons */
+button {
+    display: inline-block;
+    background-color: #6C63FF;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s ease;
+    margin: 8px 0;
+}
+
+    button:hover {
+        background-color: #5149e0;
+        transform: scale(1.05);
+    }
+
+.reset-button {
+    background-color: #FF6F61;
+    margin-left: 12px;
+}
+
+    .reset-button:hover {
+        background-color: #e15d56;
+        transform: scale(1.05);
+    }
+
+/* Inputs */
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1.1em;
+    box-sizing: border-box;
+    background-color: #fafafa;
+    transition: border-color 0.3s;
+}
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    textarea:focus {
+        border-color: #6C63FF;
+        outline: none;
+    }
+
+/* Loading Indicator */
+.loading {
+    font-style: italic;
+    color: #888;
+}
+
+/* Response Divs */
+.response {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #e9f7fe;
+    border-left: 5px solid #6C63FF;
+    border-radius: 8px;
+    display: none;
+}
+
+    .response pre {
+        font-size: 1em;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        color: #444;
+    }
+
+/* Navigation Menu */
+ul {
+    list-style-type: none;
+    padding: 10px 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    background-color: #6C63FF;
+    border-radius: 12px;
+}
+
+    ul li {
+        margin: 0;
+    }
+
+        ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 12px 20px;
+            display: block;
+            transition: background-color 0.3s;
+            font-size: 1.1em;
+        }
+
+            ul li a:hover {
+                background-color: #5149e0;
+            }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    button {
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        width: 100%;
+    }
+}
+
+/* Small Devices (Phone Portrait) */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    .container {
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+        font-size: 1em;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* General Styles */
+/*body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}*/
+
+/* Container */
+/*.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}*/
+
+/* Header Styles */
+/*h1 {
+    text-align: center;
+    color: #CD5C5C;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.5em;
+    color: #444;
+    margin-bottom: 15px;
+}*/
+
+/* Buttons */
+/*button {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 5px 0;
+}
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+.reset-button {
+    background-color: #f44336;
+    margin-left: 10px;
+}
+
+    .reset-button:hover {
+        background-color: #d32f2f;
+    }*/
+
+/* Inputs */
+/*input[type="date"],
+input[type="number"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}*/
+
+/* Loading Indicator */
+/*.loading {
+    font-style: italic;
+    color: #666;
+}*/
+
+/* Response Divs */
+/*.response {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-left: 5px solid #007bff;
+    border-radius: 5px;
+    display: none;
+}
+
+    .response pre {
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }*/
+
+/* Navigation Menu */
+/*ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    background-color: #007bff;
+    border-radius: 8px;
+}
+
+    ul li {
+        margin: 0;
+    }
+
+        ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 15px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+
+            ul li a:hover {
+                background-color: #0056b3;
+            }*/
+
+/* Mobile Responsiveness */
+/*@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    input[type="date"],
+    input[type="number"] {
+        width: 100%;
+    }
+}*/
