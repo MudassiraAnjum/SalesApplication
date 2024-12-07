@@ -91,6 +91,7 @@ namespace SalesApplication.Middleware
                     message = "An unexpected error occurred. Please try again later.";
                     _logger.LogError(generalEx, "General exception occurred.");
                     break;
+
             }
 
             context.Response.ContentType = "application/json";

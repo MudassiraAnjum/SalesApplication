@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SalesApplication.Dto;
 using SalesApplication.IServices;
+using System.Net;
 using System.Security.Claims;
 
 namespace SalesApplication.Controllers
@@ -30,54 +31,39 @@ namespace SalesApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllShipper()
         {
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userName = User.Identity?.Name;
+            var getAll = await _shipperService.GetAllShipper();
+            return Ok(getAll);
+        }
 
-            if (userRole == "Shipper")
-            {
-                // Fetch only the logged-in shipper's details
-                var shipper = await _shipperService.GetShipperByCompanyName(userName);
+        //// If Admin, fetch all shippers
+        //var allShippers = await _shipperService.GetAllShipper();
+        //    return Ok(allShippers);
+        //}
 
-                if (shipper == null)
-                {
-                    return NotFound("No details found for the logged-in shipper.");
-                }
 
-                return Ok(shipper);
-            }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("totalamountearnedbyshipper/{date}")]
+        public async Task<IActionResult> GetTotalAmountEarnedByShipperOnDateAsync(DateTime date)
+        {
+            var result = await _shipperService.GetTotalAmountEarnedByShipperOnDateAsync(date);
 
-            // If Admin, fetch all shippers
-            var allShippers = await _shipperService.GetAllShipper();
-            return Ok(allShippers);
+            if (result == null || !result.Any())
+                return NotFound("No shipper earnings found for the specified date.");
+
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin,Shipper")]
+        [HttpPut("{shipperId}")]
+        public async Task<IActionResult> UpdateShipper(int shipperId, [FromBody] ShipperDto shipperDto)
+        {
+            var updatedShipper = await _shipperService.UpdateShipperFullAsync(shipperId, shipperDto);
+            if (updatedShipper == null) return NotFound();
+            return Ok(updatedShipper);
         }
 
 
         [Authorize(Roles = "Admin,Shipper")]
-        [HttpGet("totalamountearnedbyshipper/{date}")]
-        public async Task<IActionResult> GetTotalAmountEarnedByShipperOnDateAsync(DateTime date)
-        {
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userName = User.Identity?.Name;
-
-            if (userRole == "Shipper")
-            {
-                var earnings = await _shipperService.GetEarningsByShipperAndDateAsync(userName, date);
-
-                if (earnings == null || !earnings.Any())
-                {
-                    return NotFound("No sales made by the logged-in shipper on the specified date.");
-                }
-
-                return Ok(earnings);
-            }
-
-            // If Admin, fetch all earnings
-            var allEarnings = await _shipperService.GetTotalAmountEarnedByShipperOnDateAsync(date);
-            return Ok(allEarnings);
-        }
-
-
-        [Authorize(Roles="Admin,Shipper")]
         [HttpPatch("edit/{shipperId}")]
         public async Task<IActionResult> UpdateShipper(int shipperId, [FromBody] JsonPatchDocument<ShipperUpdateDto> patchDoc)
         {
