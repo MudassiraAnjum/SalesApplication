@@ -4,7 +4,7 @@ namespace SalesApplication.Dto
 {
     public class TerritoryDto
     {
-        //public string TerritoryId { get; set; } = null!;
+        public string TerritoryId { get; set; } = null!;
 
         public string TerritoryDescription { get; set; } = null!;
 

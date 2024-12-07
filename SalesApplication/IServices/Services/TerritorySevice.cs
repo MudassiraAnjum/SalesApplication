@@ -16,6 +16,14 @@ namespace SalesApplication.IServices.Services
             _mapper = mapper;
         }
 
+        public async Task<ResponseTerritoryDto> AddTerritoryAsync(TerritoryDto territoryDto)
+        {
+            var territory = _mapper.Map<Territory>(territoryDto);
+            _context.Territories.Add(territory);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ResponseTerritoryDto>(territory);
+        }
+
         public async Task<List<ResponseTerritoryDto>> GetTerritory()
         {
             var getterritory = await _context.Territories.ToListAsync();
@@ -30,12 +38,6 @@ namespace SalesApplication.IServices.Services
             return territoryDtos;
         }
 
-        public async Task<ResponseTerritoryDto> AddTerritoryAsync(TerritoryDto territoryDto)
-        {
-            var territory = _mapper.Map<Territory>(territoryDto);
-            _context.Territories.Add(territory);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<ResponseTerritoryDto>(territory);
-        }
+       
     }
 }
