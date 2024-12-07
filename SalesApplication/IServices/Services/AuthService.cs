@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SalesApplication.Data;
+using SalesApplication.Dto;
 using SalesApplication.Dtos;
 using SalesApplication.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +10,6 @@ using System.Text;
 
 namespace SalesApplication.IServices.Services
 {
-
     public class AuthService
     {
 
@@ -50,6 +50,7 @@ namespace SalesApplication.IServices.Services
         public (string Token, string Role) Authenticate(LoginDto loginDto)
         {
             string role = null;
+            int? employeeId = null;
 
             // Check in Admins
             var admins = _configuration.GetSection("Admins").Get<List<Dictionary<string, string>>>();
@@ -63,7 +64,11 @@ namespace SalesApplication.IServices.Services
             if (role == null)
             {
                 var employee = _dbContext.Employees.FirstOrDefault(e => e.FirstName == loginDto.Username && e.Password == loginDto.Password);
-                if (employee != null) role = "Employee";
+                if (employee != null)
+                {
+                    role = "Employee";
+                    employeeId = employee.EmployeeId; // Get EmployeeId
+                }
             }
 
             // Check in Shippers
@@ -76,20 +81,32 @@ namespace SalesApplication.IServices.Services
             if (role == null)
                 return (null, null); // Invalid credentials
 
-            var token = GenerateJwtToken(loginDto.Username, role);
+            var token = GenerateJwtToken(loginDto.Username, role, employeeId);
             return (token, role);
         }
 
-        private string GenerateJwtToken(string username, string role)
+        private string GenerateJwtToken(string username, string role, int? employeeId = null, string firstName = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
-        };
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            // Add EmployeeId claim if the role is Employee
+            if (role == "Employee" && employeeId.HasValue)
+            {
+                claims.Add(new Claim("EmployeeId", employeeId.Value.ToString()));
+            }
+
+            // Add firstname claim if provided
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                claims.Add(new Claim("firstname", firstName));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
