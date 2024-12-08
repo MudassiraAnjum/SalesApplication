@@ -6,6 +6,7 @@ using SalesApplication.Data;
 using SalesApplication.Dto;
 using SalesApplication.Models;
 using SalesApplication.IServices;
+using System.Security.Claims;
 
 namespace SalesApplication.IServices.Services
 {
@@ -13,39 +14,62 @@ namespace SalesApplication.IServices.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        public EmployeeService(ApplicationDbContext context, IMapper mapper)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public EmployeeService(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
             _mapper = mapper;
             _context = context;
+            _contextAccessor = contextAccessor;
         }
-        public async Task<ResponseEmployeeDto> UpdateEmployee(int employeeId, CreateEmployeeDto employeeDto)
+        public async Task<ResponseEmployeeDto> UpdateEmployeeByAsync(int employeeId, CreateEmployeeDto employeeDto, ClaimsPrincipal user)
         {
+            // Get the current user's EmployeeId from claims
+            var currentUserId = user.FindFirst("EmployeeId")?.Value;
+
+            // Check if the user is an employee and is trying to update their own details
+            if (currentUserId == null || (currentUserId != employeeId.ToString() && !user.IsInRole("Admin")))
+            {
+                throw new UnauthorizedAccessException("You do not have permission to update this employee's details.");
+            }
+
             var employee = await _context.Employees.FindAsync(employeeId);
 
             if (employee == null)
                 throw new Exception("Employee not found");
 
-
+            // Map the updated details from employeeDto to the employee entity
             _mapper.Map(employeeDto, employee);
-
 
             _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
 
-
             return _mapper.Map<ResponseEmployeeDto>(employee);
         }
 
-        public async Task<ResponseEmployeeDto> PatchUpdateEmployee(int empid, JsonPatchDocument<CreateEmployeeDto> patch)
+        public async Task<ResponseEmployeeDto> PatchUpdateEmployee(int empid, JsonPatchDocument<ResponseEmployeeDto> patch)
         {
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+            var employeeIdClaim = _contextAccessor.HttpContext?.User.FindFirst("EmployeeId")?.Value;
+
+            if (userRole == "Employee" && int.TryParse(employeeIdClaim, out var employeeId))
+            {
+                if (empid != employeeId)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to update this employee.");
+                }
+            }
+
             var pemployee = await _context.Employees.FindAsync(empid);
             if (pemployee == null)
-                throw new Exception("Employee not found");
+            {
+                throw new KeyNotFoundException("Employee not found.");
+            }
 
-            var upemployee = _mapper.Map<CreateEmployeeDto>(pemployee);
+            var upemployee = _mapper.Map<ResponseEmployeeDto>(pemployee);
             patch.ApplyTo(upemployee);
             _mapper.Map(upemployee, pemployee);
             await _context.SaveChangesAsync();
+
             return _mapper.Map<ResponseEmployeeDto>(pemployee);
         }
 

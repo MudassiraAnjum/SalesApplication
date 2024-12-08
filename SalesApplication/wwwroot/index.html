@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Application</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: #f4f4f4;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .main-container {
+            display: flex;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: lightblue;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 400px;
+            position: fixed;
+        }
+
+            .sidebar h2 {
+                text-align: center;
+                color: #333;
+            }
+
+        .operation {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .operation:hover {
+                background-color: #f0e68c;
+            }
+
+        .main-content {
+            margin-left: 370px;
+            padding: 20px;
+            flex-grow: 1;
+            margin-top: 20px;
+        }
+
+        .operation-form {
+            display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+            .operation-form input, .operation-form button {
+                width: calc(100% - 22px);
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+
+            .operation-form button {
+                background-color: lightblue;
+                border: none;
+                color: #333;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+                .operation-form button:hover {
+                    background-color: aliceblue;
+                }
+
+        .response-box {
+            background-color: #e7f3fe;
+            border: 1px solid #b3d4fc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 style="color:cadetblue;">Sales Application</h1>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h2>Operations</h2>
+            <div class="operation" onclick="showForm('authOperations')">Login</div>
+            <div class="operation" onclick="showForm('employeeOperations')">Employee Operations</div>
+            <div class="operation" onclick="showForm('orderOperations')">Order Operations</div>
+            <div class="operation" onclick="showForm('orderDetailOperations')">Order Details Operations</div>
+            <div class="operation" onclick="showForm('territoryOperations')">Territory Operations</div>
+            <div class="operation" onclick="showForm('shipperOperations')">Shipper Operations</div>
+            <div class="operation" onclick="logout()">Logout</div>
+        </div>
+
+        <div class="main-content">
+            <div id="authOperations" class="operation-form">
+                <h3>Authentication</h3>
+                <h4>Login</h4>
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button onclick="login()">Login</button>
+                <div id="loginResponse" class="response-box"></div><h4>Register</h4>
+                <input type="text" id="registerCompanyName" placeholder="Company Name" required>
+                <input type="text" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+                <button onclick="register()">Register</button>
+                <div id="registerResponse" class="response-box"></div>
+            </div>
+
+            <div id="employeeOperations" class="operation-form">
+                <h3>Employee Operations</h3>
+                <h4>Update Employee</h4>
+                <input type="number" id="updateEmployeeId" placeholder="Employee ID" required>
+                <input type="text" id="updateEmployeeData" placeholder='{"name": "John Doe", "position": "Sales"}' required>
+                <button onclick="updateEmployee()">Update Employee</button>
+                <div id="updateEmployeeResponse" class="response-box"></div>
+
+                <h4>Patch Employee</h4>
+                <input type="number" id="patchEmployeeId" placeholder="Employee ID" required>
+                <input type="text" id="patchEmployeeData" placeholder='{"op": "replace", "path": "/name", "value": "Jane Doe"}' required>
+                <button onclick="patchEmployee()">Patch Employee</button>
+                <div id="patchEmployeeResponse" class="response-box"></div>
+
+                <h4>Get Sales Employee Made On Date</h4>
+                <input type="number" id="salesEmployeeId" placeholder="Employee ID" required>
+                <input type="date" id="salesDate" required>
+                <button onclick="getSalesEmployeeMadeOnDate()">Get Sales</button>
+                <div id="salesEmployeeResponse" class="response-box"></div>
+            </div>
+
+            <div id="orderOperations" class="operation-form">
+                <h3>Order Operations</h3>
+                <button onclick="getAllOrders()">Get All Orders</button>
+                <div id="allOrdersResponse" class="response-box"></div>
+            </div>
+
+            <div id="orderDetailOperations" class="operation-form">
+                <h3>Order Detail Operations</h3>
+                <input type="number" id="orderDetailEmployeeId" placeholder="Employee ID" required>
+                <button onclick="getOrderDetailsByEmployeeId()">Get Order Details</button>
+                <div id="orderDetailsResponse" class="response-box"></div>
+            </div>
+
+            <div id="territoryOperations" class="operation-form">
+                <h3>Territory Operations</h3>
+                <input type="text" id="territoryData" placeholder="Territory Data (JSON)" required>
+                <button onclick="createTerritory()">Create Territory</button>
+                <div id="territoryResponse" class="response-box"></div>
+            </div>
+
+            <div id="shipperOperations" class="operation-form">
+                <h3>Shipper Operations</h3>
+                <button onclick="getTotalShipments()">Get Total Shipments</button>
+                <div id="totalShipmentsResponse" class="response-box"></div>
+                <button onclick="getTotalEarnings()">Get Total Earnings</button>
+                <div id="totalEarningsResponse" class="response-box"></div>
+                <h4>Get Shippers By Company Name</h4>
+                <input type="text" id="companyName" placeholder="Company Name" required>
+                <button onclick="getShippersByCompanyName()">Get Shippers</button>
+                <div id="shippersResponse" class="response-box"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let token = '';
+
+        function showForm(formId) {
+            const userRole = localStorage.getItem('userRole'); // Retrieve the logged-in user's role
+
+            // Define restricted forms for specific roles
+            const restrictedForms = {
+                Shipper: ['employeeOperations', 'orderOperations', 'territoryOperations', 'orderDetailOperations'], // Forms restricted for Shipper
+                Employee: ['shipperOperations','territoryOperations'] // Example restriction for Employee
+            };
+
+            // Check if the current role is restricted from accessing the form
+            if (restrictedForms[userRole] && restrictedForms[userRole].includes(formId)) {
+                alert(`Unauthorized Access: As a ${userRole}, you are not allowed to access this operation.`);
+                return; // Prevent the restricted form from being displayed
+            }
+
+            // Hide all forms and show the requested form
+            const forms = document.querySelectorAll('.operation-form');
+            forms.forEach(form => form.style.display = 'none');
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        window.onload = function () {
+            showForm('authOperations'); // Show the authentication form by default
+        };
+
+
+
+        function login() {
+            const username = $('#login-username').val().trim();
+            const password = $('#login-password').val().trim();
+
+            if (!username || !password) {
+                $('#loginResponse').html('Error: Username and password are required.');
+                return;
+            }
+
+            $.ajax({
+                url: `/api/auth/login`, // No query parameters
+                method: 'POST',
+                contentType: 'application/json', // Indicate JSON format
+                data: JSON.stringify({ username, password }), // Send data as JSON
+                success: function (response) {
+                    const allowedRoles = ['Shipper', 'Admin', 'Employee']; // Allowed roles
+
+                    if (!allowedRoles.includes(response.role)) {
+                        $('#loginResponse').html('Error: Access denied. Unauthorized role.');
+                        return; // Stop further execution
+                    }
+
+                    // Store token and role in local storage
+                    localStorage.setItem('authToken', response.token);
+                    localStorage.setItem('userRole', response.role);
+                    $('#loginResponse').html(`Login successful! Role: ${response.role}`);
+                },
+                error: function (err) {
+                    $('#loginResponse').html(`Error: ${err.responseText}`);
+                }
+            });
+        }
+
+
+        function register() {
+            const companyName = $('#registerCompanyName').val();
+            const email = $('#registerEmail').val();
+            const password = $('#registerPassword').val();
+
+            if (!companyName || !email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/auth/register',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ companyName, email, password }),
+                success: function (response) {
+                    $('#registerResponse').html('Registration successful! ' + response);
+                },
+                error: function (err) {
+                    $('#registerResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken'); // Clear the token
+            localStorage.removeItem('userRole'); // Clear the role
+            alert('You have been logged out.');
+            $('input').val('');
+            $('.response-box').html('');
+            $('.operation-form').hide();
+            showForm('authOperations');
+            location.reload();
+        }
+
+        function updateEmployee() {
+            const token = localStorage.getItem('authToken');
+            const employeeId = $('#updateEmployeeId').val();
+            const employeeData = JSON.parse($('#updateEmployeeData').val());
+
+            $.ajax({
+                url: `/api/employee/${employeeId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                headers: { 'Authorization': `Bearer ${token}` },
+                data: JSON.stringify(employeeData),
+                success: function (response) {
+                    $('#updateEmployeeResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#updateEmployeeResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function patchEmployee() {
+            const token = localStorage.getItem('authToken');
+            const employeeId = $('#patchEmployeeId').val();
+            const patchData = JSON.parse($('#patchEmployeeData').val());
+
+            $.ajax({
+                url: `/api/employee/${employeeId}`,
+                method: 'PATCH',
+                contentType: 'application/json',
+                headers: { 'Authorization': `Bearer ${token}` },
+                data: JSON.stringify(patchData),
+                success: function (response) {
+                    $('#patchEmployeeResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#patchEmployeeResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function getSalesEmployeeMadeOnDate() {
+            const token = localStorage.getItem('authToken');
+            const employeeId = $('#salesEmployeeId').val();
+            const date = $('#salesDate').val();
+
+            $.ajax({
+                url: `/api/employee/${employeeId}?date=${date}`,
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function (response) {
+                    $('#salesEmployeeResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#salesEmployeeResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function getAllOrders() {
+            const token = localStorage.getItem('authToken');
+
+            $.ajax({
+                url: '/api/order',
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function (response) {
+                    $('#allOrdersResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#allOrdersResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+
+        function getOrderDetailsByEmployeeId() {
+            const token = localStorage.getItem('authToken');
+            const employeeId = $('#orderDetailEmployeeId').val().trim();
+
+            if (!employeeId) {
+                $('#orderDetailsResponse').html('Error: Employee ID is required.');
+                return;
+            }
+
+            $.ajax({
+                url: `/api/orderdetail/bill/${employeeId}`, // Match backend route
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        $('#orderDetailsResponse').html('<pre>' + JSON.stringify(response, null, 2) + '</pre>');
+                    } else {
+                        $('#orderDetailsResponse').html('No order details found.');
+                    }
+                },
+                error: function (err) {
+                    const message = err.responseJSON?.message || err.responseText || 'An unknown error occurred.';
+                    $('#orderDetailsResponse').html('Error: ' + message);
+                }
+            });
+        }
+
+        function createTerritory() {
+            const token = localStorage.getItem('authToken');
+            const territoryData = JSON.parse($('#territoryData').val());
+
+            $.ajax({
+                url: '/api/territory',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: { 'Authorization': `Bearer ${token}` },
+                data: JSON.stringify(territoryData),
+                success: function (response) {
+                    $('#territoryResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#territoryResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function getTotalShipments() {
+            const token = localStorage.getItem('authToken');
+
+            $.ajax({
+                url: '/api/shipper/total-shipments',
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function (response) {
+                    $('#totalShipmentsResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#totalShipmentsResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+        function getTotalEarnings() {
+            const token = localStorage.getItem('authToken');
+
+            $.ajax({
+                url: '/api/shipper/total-earnings',
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+                success: function (response) {
+                    $('#totalEarningsResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#totalEarningsResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+
+        function getShippersByCompanyName() {
+            const token = localStorage.getItem('authToken');
+            const company = $('#companyName').val();
+
+            $.ajax({
+                url: `/api/shipper/search/${company}`, // Updated URL
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }, // Corrected header syntax
+                success: function (response) {
+                    $('#shippersResponse').html(JSON.stringify(response));
+                },
+                error: function (err) {
+                    $('#shippersResponse').html('Error: ' + err.responseText);
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

@@ -22,15 +22,13 @@ namespace SalesApplication.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTerritory([FromBody] CreateTerritoryDto territoryDto)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var responseTerritoryDto = await _service.CreateTerritory(territoryDto);
-                return Ok(responseTerritoryDto);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+
+            var responseTerritoryDto = await _service.AddTerritoryAsync(territoryDto);
+            return Ok(responseTerritoryDto);
         }
     }
 }

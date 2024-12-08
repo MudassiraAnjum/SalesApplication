@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SalesApplication.Dto;
 using SalesApplication.IServices;
 
 
@@ -17,11 +18,11 @@ namespace SalesApplication.Controllers
         }
 
         [Authorize(Roles = "Admin,Employee")]
-        [HttpGet("{getid}")]
-        public async Task<IActionResult> GetOrderDetailsByEmployeeId(int getid)
+        [HttpGet("bill/{employeeId}")]
+        public async Task<ActionResult<List<ResponseOrderDetailsDto>>> GetBillAmountByEmployeeId(int employeeId)
         {
-            var result = await _orderDetailService.GetOrderDetailById(getid);
-            return Ok(result);
+            var bills = await _orderDetailService.GetOrderDetailsByEmployeeId(employeeId);
+            return Ok(bills);
         }
     }
 }

@@ -18,15 +18,12 @@ namespace SalesApplication.IServices.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseTerritoryDto> CreateTerritory(CreateTerritoryDto createterritorydto)
+        public async Task<ResponseTerritoryDto> AddTerritoryAsync(CreateTerritoryDto territoryDto)
         {
-
-            var territory = _mapper.Map<Territory>(createterritorydto);
+            var territory = _mapper.Map<Territory>(territoryDto);
             _context.Territories.Add(territory);
             await _context.SaveChangesAsync();
             return _mapper.Map<ResponseTerritoryDto>(territory);
-
-
         }
     }
 }

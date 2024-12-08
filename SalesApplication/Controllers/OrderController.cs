@@ -16,7 +16,7 @@ namespace SalesApplication.Controllers
             _orderService = orderService;
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {

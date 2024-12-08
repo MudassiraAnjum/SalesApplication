@@ -18,7 +18,7 @@ namespace SalesApplication.IServices.Services
             _mapper = mapper;
         }
 
-       
+
 
         public async Task<List<ShipperTotalAmountDto>> GetTotalAmount()
         {
@@ -62,16 +62,15 @@ namespace SalesApplication.IServices.Services
                 .ToListAsync();
 
             return shipments;
-
-
         }
 
-        public async Task<IEnumerable<ResponseShipperDto>> GetByCompanyName(string companyName)
+        public async Task<IEnumerable<ResponseShipperDto>> GetAllShippersByCompanyNameAsync(string companyName)
         {
+            var shippers = await _context.Shippers
+                .Where(s => EF.Functions.Like(s.CompanyName.ToLower(), $"%{companyName.ToLower()}%"))
+                .ToListAsync();
 
-            var shippers = await _context.Shippers.Where(c => EF.Functions.Like(c.CompanyName.ToLower(), $"%{companyName.ToLower()}%")).ToListAsync();
             return _mapper.Map<IEnumerable<ResponseShipperDto>>(shippers);
-
         }
     }
 }

@@ -6,7 +6,7 @@ namespace SalesApplication.IServices
     {
         Task<List<ShipperTotalShipmentDto>> GetTotalShipment();
         Task<List<ShipperTotalAmountDto>> GetTotalAmount();
-        Task<IEnumerable<ResponseShipperDto>> GetByCompanyName(string companyName);
+        Task<IEnumerable<ResponseShipperDto>> GetAllShippersByCompanyNameAsync(string companyName);
 
     }
 }

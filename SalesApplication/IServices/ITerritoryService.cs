@@ -3,6 +3,6 @@ namespace SalesApplication.IServices
 {
     public interface ITerritoryService
     {
-        Task<ResponseTerritoryDto> CreateTerritory(CreateTerritoryDto createterritorydto);
+        Task<ResponseTerritoryDto> AddTerritoryAsync(CreateTerritoryDto territoryDto);
     }
 }

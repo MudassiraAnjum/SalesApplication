@@ -17,9 +17,9 @@ namespace SalesApplication.Controllers
             _shipperService = shipperService;
         }
 
-        
 
-        [Authorize(Roles = "Admin,Shipper")]
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("total-shipments")]
         public async Task<IActionResult> GetTotalShipmentsByShipper()
         {
@@ -27,7 +27,7 @@ namespace SalesApplication.Controllers
             return Ok(totalShipments);
         }
 
-        [Authorize(Roles = "Admin,Shipper")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("total-earnings")]
         public async Task<IActionResult> GetTotalAmountEarnedByShippers()
         {
@@ -35,12 +35,12 @@ namespace SalesApplication.Controllers
             return Ok(totalEarnings);
         }
 
-        [Authorize(Roles = "Admin,Shipper")]
-        [HttpGet("companyname-shippers")]
-        public async Task<IActionResult> GetShippersByComapanyName(string company)
+        [Authorize(Roles = "Admin")]
+        [HttpGet("search/{companyName}")]
+        public async Task<ActionResult<IEnumerable<ResponseShipperDto>>> SearchShipperByCompanyName(string companyName)
         {
-            var companyship = await _shipperService.GetByCompanyName(company);
-            return Ok(companyship);
+            var shippers = await _shipperService.GetAllShippersByCompanyNameAsync(companyName);
+            return Ok(shippers);
         }
     }
 }

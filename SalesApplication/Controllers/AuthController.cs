@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SalesApplication.Dto;
-using SalesApplication.IServices;
 using SalesApplication.IServices.Services;
 
 namespace SalesApplication.Controllers
@@ -14,33 +12,35 @@ namespace SalesApplication.Controllers
 
         private readonly AuthService _authService;
 
-
         public AuthController(AuthService authService)
         {
             _authService = authService;
-
         }
+
 
         [HttpPost("register")]
-        public async Task<IActionResult> AddShipper([FromBody] RegShipperDto shipperDto)
-        {
-            var createdShipper = await _authService.RegisterShipperAsync(shipperDto);
-            return Ok(createdShipper);
-
-        }
-
-        [HttpPost("login")]
-        public IActionResult Login(string username, string password)
+        public async Task<IActionResult> Register([FromBody] RegShipperDto registrationDto)
         {
             try
             {
-                var tokenModel = _authService.Authenticate(username, password);
-                return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
+                var result = await _authService.RegisterShipperAsync(registrationDto);
+                return Ok(result);
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while registering.");
+            }
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginDto loginDto)
+        {
+            var tokenModel = _authService.Authenticate(loginDto);
+            if (tokenModel.Token == null)
             {
                 return Unauthorized("Invalid username or password");
             }
+            return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
         }
 
     }

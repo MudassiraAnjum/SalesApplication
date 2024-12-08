@@ -55,6 +55,11 @@ namespace SalesApplication.Middleware
                     code = HttpStatusCode.BadRequest;
                     result = "Invalid JSON format.";
                     break;
+                case UnauthorizedAccessException:
+                    // 401 Unauthorized: User lacks valid credentials.
+                    code = HttpStatusCode.Unauthorized;
+                    result = "You are not authorized to perform this action.";
+                    break;
                 case DbUpdateConcurrencyException _:
                     code = HttpStatusCode.Conflict;
                     result = "Concurrency conflict occurred. Please try again.";

@@ -4,6 +4,6 @@ namespace SalesApplication.IServices
 {
     public interface IOrderDetailService
     {
-        public Task<IEnumerable<ResponseOrderDetailsDto>> GetOrderDetailById(int id);
+        Task<List<ResponseOrderDetailsDto>> GetOrderDetailsByEmployeeId(int employeeId);
     }
 }

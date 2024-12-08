@@ -51,6 +51,9 @@ namespace SalesApplication
                 };
             });
 
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
+
 
 
             builder.Services.AddAutoMapper(typeof(SalesMapper));
