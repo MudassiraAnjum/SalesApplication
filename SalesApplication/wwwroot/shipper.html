@@ -130,6 +130,46 @@
             <button id="searchShipper">Search Shipper</button>
             <div class="response" id="searchShipperResponse"></div>
         </div>
+
+        <!-- Get Total Amount Earned by Shipper on a Specific Date -->
+        <div class="endpoint">
+            <h2>Get Total Amount Earned by Shipper on a Specific Date</h2>
+            <input type="date" id="earningsDate" required>
+            <button id="getTotalEarningsByDate">Get Earnings by Date</button>
+            <div class="response" id="totalEarningsResponse"></div>
+        </div>
+
+        <!-- Update Shipper (using JSON Patch) -->
+        <div class="endpoint">
+            <h2>Update Shipper (JSON Patch)</h2>
+            <input type="number" id="updateShipperIdPatch" placeholder="Enter Shipper ID" required>
+            <input type="text" id="updateShipperNamePatch" placeholder="Enter New Shipper Name">
+            <input type="text" id="updateShipperPhonePatch" placeholder="Enter New Shipper Phone">
+            <button id="updateShipperPatch">Update Shipper</button>
+            <div class="response" id="updateShipperResponsePatch"></div>
+        </div>
+
+        <!-- Get Total Shipments by Shipper -->
+        <div class="endpoint">
+            <h2>Get Total Shipments by Shipper</h2>
+            <button id="getTotalShipments">Get Total Shipments</button>
+            <div class="response" id="totalShipmentsResponse"></div>
+        </div>
+
+        <!-- Get Total Amount Earned by Shippers -->
+        <div class="endpoint">
+            <h2>Get Total Amount Earned by Shippers</h2>
+            <button id="getTotalEarnings">Get Total Earnings</button>
+            <div class="response" id="totalEarningsResponse"></div>
+        </div>
+
+        <!-- Get Total Amount Earned by Shipper in a Specific Year -->
+        <div class="endpoint">
+            <h2>Get Total Amount Earned by Shipper in a Specific Year</h2>
+            <input type="number" id="yearInput" placeholder="Enter Year" required>
+            <button id="getTotalEarningsByYear">Get Earnings by Year</button>
+            <div class="response" id="totalEarningsByYearResponse"></div>
+        </div>
     </div>
 
     <script>
@@ -248,7 +288,7 @@
                     url: `/api/shipper/search/${companyName}`,
                     method: 'GET',
                     headers: {
-                        'Authorization': 'Bearer ${token}`
+                        'Authorization': `Bearer ${token}`
                     },
                     success: function (data) {
                         hideLoading('#searchShipperResponse');
@@ -260,7 +300,127 @@
                     }
                 });
             });
+        //});
+
+        // Get Total Amount Earned by Shipper on a Specific Date
+        $('#getTotalAmountByDate').click(function () {
+            clearResults('#shipperEarningsByDateResponse');
+            const date = $('#shipperEarningsDate').val();
+            const token = localStorage.getItem('token');
+            showLoading('#shipperEarningsByDateResponse');
+            $.ajax({
+                url: `/api/shipper/totalamountearnedbyshipper/${date}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#shipperEarningsByDateResponse');
+                    $('#shipperEarningsByDateResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#shipperEarningsByDateResponse');
+                    $('#shipperEarningsByDateResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
         });
+
+        // Update Shipper Details
+        $('#updateShipperDetails').click(function () {
+            clearResults('#updateShipperResponse');
+            const shipperId = $('#shipperIdToUpdate').val();
+            const patchData = [
+                { "op": "replace", "path": "/name", "value": $('#updateShipperName').val() },
+                { "op": "replace", "path": "/phone", "value": $('#updateShipperPhone').val() }
+            ];
+            const token = localStorage.getItem('token');
+            showLoading('#updateShipperResponse');
+            $.ajax({
+                url: `/api/shipper/edit/${shipperId}`,
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json-patch+json'
+                },
+                data: JSON.stringify(patchData),
+                success: function () {
+                    hideLoading('#updateShipperResponse');
+                    $('#updateShipperResponse').html('Shipper updated successfully.').show();
+                },
+                error: function (err) {
+                    hideLoading('#updateShipperResponse');
+                    $('#updateShipperResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Total Shipments by Shipper
+        $('#getTotalShipments').click(function () {
+            clearResults('#totalShipmentsResponse');
+            const token = localStorage.getItem('token');
+            showLoading('#totalShipmentsResponse');
+            $.ajax({
+                url: `/api/shipper/total-shipments`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#totalShipmentsResponse');
+                    $('#totalShipmentsResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#totalShipmentsResponse');
+                    $('#totalShipmentsResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Total Amount Earned by All Shippers
+        $('#getTotalEarnings').click(function () {
+            clearResults('#totalEarningsResponse');
+            const token = localStorage.getItem('token');
+            showLoading('#totalEarningsResponse');
+            $.ajax({
+                url: `/api/shipper/total-earnings`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#totalEarningsResponse');
+                    $('#totalEarningsResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#totalEarningsResponse');
+                    $('#totalEarningsResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Total Earnings by Shipper for a Specific Year
+        $('#getTotalEarningsByYear').click(function () {
+            clearResults('#totalEarningsByYearResponse');
+            const year = $('#earningsYear').val();
+            const token = localStorage.getItem('token');
+            showLoading('#totalEarningsByYearResponse');
+            $.ajax({
+                url: `/api/shipper/totalamountearnedbyshipper/${year}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#totalEarningsByYearResponse');
+                    $('#totalEarningsByYearResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#totalEarningsByYearResponse');
+                    $('#totalEarningsByYearResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+    });
     </script>
 </body>
 </html>
