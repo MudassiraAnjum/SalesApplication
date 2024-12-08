@@ -20,6 +20,12 @@ namespace SalesApplication.Mapper
             CreateMap<Employee, EmployeeSalesDto>().ReverseMap();
             CreateMap<Employee, EmployeeDto>().ReverseMap();
 
+            CreateMap<ResponseOrderDto, Order>().ReverseMap();
+            CreateMap<Order, ShipperDetailsDto>().ReverseMap();
+            CreateMap<Order, OrdersShipDetailsDto>().ReverseMap();
+            CreateMap<Employee, OrdersByEmployeeDto>().ReverseMap();
+
+            CreateMap<ResponseOrderDetailsDto,OrderDetail>().ReverseMap();
         }
     }
 }
