@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SalesApplication.Dto;
 using SalesApplication.IServices;
+using SalesApplication.IServices.Services;
 using System.Security.Claims;
 
 namespace SalesApplication.Controllers
@@ -19,7 +20,7 @@ namespace SalesApplication.Controllers
             _employeeService = employeeService;
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("by-region/{regionDescription}")]
         public async Task<ActionResult<IEnumerable<ResponseEmployeeDto>>> GetEmployeesByRegion(string regionDescription)
         {
@@ -27,7 +28,7 @@ namespace SalesApplication.Controllers
             return Ok(employees);
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("by-hire-date/{hireDate}")]
         public async Task<ActionResult<IEnumerable<ResponseEmployeeDto>>> GetEmployeesByHireDate(DateTime hireDate)
         {
@@ -35,17 +36,6 @@ namespace SalesApplication.Controllers
             return Ok(employees);
         }
 
-        [Authorize(Roles = "Admin,Employee")]
-        [HttpGet("lowest-sale/{date}")]
-        public async Task<ActionResult<ResponseEmployeeDto>> GetLowestSaleByEmployeeOnDate(DateTime date)
-        {
-            var result = await _employeeService.GetLowestSaleByEmpOnDateAsync(date);
-            if (result == null)
-            {
-                return NotFound(new { Message = "No sales found for the specified date." });
-            }
-            return Ok(result);
-        }
 
         [Authorize(Roles = "Admin,Employee")]
         [HttpGet("birthday-by-date")]
@@ -187,6 +177,29 @@ namespace SalesApplication.Controllers
                 return NotFound("No sales found for this employee on the given date.");
             }
             return Ok(saledate);
+        }
+
+        [Authorize(Roles = "Admin,Employee")]
+        [HttpPut("update/{employeeId}")]
+        public async Task<IActionResult> UpdateEmployee(int employeeId, [FromBody] EmployeeDto employeeDto)
+        {
+            // Check if the employeeDto is null
+            if (employeeDto == null)
+            {
+                return BadRequest("Employee data is null.");
+            }
+
+            // Call the service method to update the employee
+            var updatedEmployee = await _employeeService.UpdateEmployeeByAsync(employeeId, employeeDto, HttpContext.User);
+
+            // Check if the update was successful
+            if (updatedEmployee == null)
+            {
+                return NotFound("Employee not found or you do not have permission to update this employee's details.");
+            }
+
+            // Return the updated employee details
+            return Ok(updatedEmployee);
         }
     }
 }

@@ -38,19 +38,18 @@ namespace SalesApplication
                 });
 
 
-            // Register IHttpContextAccessor
-            builder.Services.AddHttpContextAccessor();
+
 
 
             // Add AutoMapper
             builder.Services.AddAutoMapper(typeof(SalesMapperProfile));
 
             // Add application services
-            //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-            //builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<ITerritoryService, TerritoryService>();
-            //builder.Services.AddScoped<IShipperService, ShipperService>();
-            //builder.Services.AddScoped<IOrderDetailService, OrderDetailsService>();
+            builder.Services.AddScoped<IShipperService, ShipperService>();
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 
@@ -58,8 +57,9 @@ namespace SalesApplication
 
             // Add controllers with JSON support
             builder.Services.AddControllers().AddNewtonsoftJson();
-            // Register IHttpContextAccessor
 
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
 
             // Configure CORS
             builder.Services.AddCors(options =>

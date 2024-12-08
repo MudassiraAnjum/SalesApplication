@@ -23,7 +23,7 @@ namespace SalesApplication.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Employee")]
         [HttpGet("employee/{firstName}")]
         public async Task<ActionResult<IEnumerable<ResponseOrderDto>>> GetOrdersByEmployee(string firstName)
         {
@@ -34,15 +34,16 @@ namespace SalesApplication.Controllers
             }
             return Ok(orders);
         }
-        [Authorize(Roles = "Admin")]
-        [HttpGet("shipdetails/{orderId}")]
-        public async Task<IActionResult> GetOrderShipperDetailsByOrderId(int orderId)
-        {
 
-            var result = await _orderService.GetOrderShipperDetailsByOrderId(orderId);
-            return Ok(result);
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet("shipdetails/{orderId}")]
+        //public async Task<IActionResult> GetOrderShipperDetailsByOrderId(int orderId)
+        //{
 
-        }
+        //    var result = await _orderService.GetOrderShipperDetailsByOrderId(orderId);
+        //    return Ok(result);
+
+        //}
         [Authorize(Roles = "Admin")]
         [HttpGet("allShipDetails")]
         public async Task<ActionResult> GetAllShipDetailsAsync()

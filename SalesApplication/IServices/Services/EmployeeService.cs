@@ -52,44 +52,6 @@ namespace SalesApplication.IServices.Services
             return _mapper.Map<IEnumerable<ResponseEmployeeDto>>(employees);
         }
 
-        public async Task<ResponseEmployeeDto> GetLowestSaleByEmpOnDateAsync(DateTime date)
-        {
-
-            var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
-            var employeeIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("EmployeeId")?.Value;
-
-            var sales = await _context.OrderDetails
-                .Include(od => od.Order)
-                .Where(od => od.Order.OrderDate.HasValue && od.Order.OrderDate.Value.Date == date.Date)
-                .GroupBy(od => od.Order.EmployeeId)
-                .Select(g => new
-                {
-                    EmployeeId = g.Key,
-                    TotalSale = g.Sum(od =>
-                        od.UnitPrice *
-                        (decimal)od.Quantity *
-                        (1 - (decimal)od.Discount))
-                })
-                .OrderBy(x => x.TotalSale)
-                .FirstOrDefaultAsync();
-
-            if (sales == null)
-            {
-                throw new KeyNotFoundException($"No sales found for date '{date}'");
-            }
-
-            if (userRole == "Employee" && int.TryParse(employeeIdClaim, out var employeeId))
-            {
-                if (sales.EmployeeId != employeeId)
-                {
-                    throw new UnauthorizedAccessException("You are not authorized to view this data.");
-                }
-            }
-
-            var employee = await _context.Employees.FindAsync(sales.EmployeeId);
-            return _mapper.Map<ResponseEmployeeDto>(employee);
-        }
-
         public async Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByDateAsync(DateTime date)
         {
             var employees = await _context.Employees
@@ -443,6 +405,31 @@ namespace SalesApplication.IServices.Services
             }).ToList();
             return empdate;
 
+        }
+
+        public async Task<EmployeeDto> UpdateEmployeeByAsync(int employeeId, EmployeeDto employeeDto, ClaimsPrincipal user)
+        {
+            // Get the current user's EmployeeId from claims
+            var currentUserId = user.FindFirst("EmployeeId")?.Value;
+
+            // Check if the user is an employee and is trying to update their own details
+            if (currentUserId == null || (currentUserId != employeeId.ToString() && !user.IsInRole("Admin")))
+            {
+                throw new UnauthorizedAccessException("You do not have permission to update this employee's details.");
+            }
+
+            var employee = await _context.Employees.FindAsync(employeeId);
+
+            if (employee == null)
+                throw new Exception("Employee not found");
+
+            // Map the updated details from employeeDto to the employee entity
+            _mapper.Map(employeeDto, employee);
+
+            _context.Employees.Update(employee);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<EmployeeDto>(employee);
         }
     }
 }

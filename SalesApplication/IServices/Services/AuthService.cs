@@ -50,6 +50,8 @@ namespace SalesApplication.IServices.Services
         {
             string role = null;
             int? employeeId = null;
+            int? shipperId = null;
+
 
             // Check in Admins
             var admins = _configuration.GetSection("Admins").Get<List<Dictionary<string, string>>>();
@@ -74,17 +76,21 @@ namespace SalesApplication.IServices.Services
             if (role == null)
             {
                 var shipper = _dbContext.Shippers.FirstOrDefault(s => s.CompanyName == loginDto.Username && s.Password == loginDto.Password);
-                if (shipper != null) role = "Shipper";
+                if (shipper != null)
+                {
+                    role = "Shipper";
+                    shipperId=shipper.ShipperId;
+                }
             }
 
             if (role == null)
                 return (null, null); // Invalid credentials
 
-            var token = GenerateJwtToken(loginDto.Username, role, employeeId);
+            var token = GenerateJwtToken(loginDto.Username, role, employeeId,shipperId);
             return (token, role);
         }
 
-        private string GenerateJwtToken(string username, string role, int? employeeId = null, string firstName = null)
+        private string GenerateJwtToken(string username, string role, int? employeeId = null, int? shipperId = null,string firstName = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -106,6 +112,13 @@ namespace SalesApplication.IServices.Services
             {
                 claims.Add(new Claim("firstname", firstName));
             }
+
+            // Add ShipperId claim if the role is Shipper
+            if (role == "Shipper" && shipperId.HasValue)
+            {
+                claims.Add(new Claim("ShipperId", shipperId.Value.ToString()));
+            }
+
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],

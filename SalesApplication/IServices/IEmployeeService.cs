@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using SalesApplication.Dto;
+using System.Security.Claims;
 
 namespace SalesApplication.IServices
 {
@@ -7,7 +8,6 @@ namespace SalesApplication.IServices
     {
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByRegionDescAsync(string regionDescription);
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByHireDateAsync(DateTime hireDate);
-        Task<ResponseEmployeeDto> GetLowestSaleByEmpOnDateAsync(DateTime date);
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByDateAsync(DateTime date);
         Task<IEnumerable<ResponseEmployeeDto>> GetAllEmployeesAsync();
         Task<ResponseEmployeeDto> GetHighestSaleByEmployeeAsync(DateTime date);
@@ -24,5 +24,6 @@ namespace SalesApplication.IServices
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByCityAsync(string city);
         Task<IEnumerable<ResponseEmployeeDto>> GetEmployeesByTitleAsync(string title);
         Task<IEnumerable<EmployeeSalesDto>> SalesMadeByEmployeeDate(int empid, DateTime date);
+        Task<EmployeeDto> UpdateEmployeeByAsync(int employeeId, EmployeeDto employeeDto, ClaimsPrincipal user);
     }
 }
