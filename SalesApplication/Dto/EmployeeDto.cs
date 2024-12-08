@@ -19,10 +19,8 @@ namespace SalesApplication.Dto
         [StringLength(50, ErrorMessage = "Title of courtesy cannot exceed 50 characters.")]
         public string? TitleOfCourtesy { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? BirthDate { get; set; }
 
-        [DataType(DataType.Date)]
         public DateTime? HireDate { get; set; }
 
         [StringLength(100, ErrorMessage = "Address cannot exceed 100 characters.")]

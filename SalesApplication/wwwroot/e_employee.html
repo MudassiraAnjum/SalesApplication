@@ -1,10 +1,517 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .scrollable {
+            overflow-y: auto;
+            max-height: 100vh; /* Set max height to the viewport height */
+            padding-bottom: 20px; /* Add some padding to the bottom */
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 800px; /* Increased width for more space */
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 90%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+
+        .response {
+            background-color: #2e2e2e; /* Dark gray background for the response container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            /max-height: 400px;
+            / /* Set max height for scrolling */
+            overflow-y: auto; /* Add scrollbar if content exceeds max height */
+            margin-top: 20px;
+        }
+
+        .endpoint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input, select, textarea {
+            background-color: #3a3a3a; /* Darker input background */
+            color: #fff; /* White text in inputs */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 90%;
+        }
+
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                box-shadow: 0 0 2px 1px #ff5722;
+            }
+
+        .loading {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    <div class="container scrollable">
+        <div class="container">
+            <h1>Employee Management</h1>
 
+
+            <!-- Get All Employees -->
+            <div class="endpoint">
+                <h2>Get All Employees</h2>
+                <button id="getAllEmployees">Get All Employees</button>
+                <button class="reset-button" id="resetAllEmployees">Reset</button>
+                <div class="response" id="allEmployeesList"></div>
+            </div>
+
+
+            <!-- Get Sales Made by Employee Between Dates -->
+            <div class="endpoint">
+                <h2>Get Sales Made by Employee Between Dates</h2>
+                <input type="number" id="employeeIdSalesBetween" placeholder="Enter Employee ID">
+                <input type="date" id="fromDate">
+                <input type="date" id="toDate">
+                <button id="getSalesByEmployeeBetweenDates">Get Sales</button>
+                <button class="reset-button" id="resetSalesBetweenDates">Reset</button>
+                <div class="response" id="salesByEmployeeBetweenDatesList"></div>
+            </div>
+
+            <!--Patch Update Employee -->
+            <div class="endpoint">
+                <h2>Patch Update Employee</h2>
+                <input type="number" id="updateEmployeeId" placeholder="Enter Employee ID">
+                <textarea id="employeeData" placeholder="Enter Employee Data (JSON format)"></textarea>
+                <button id="updateEmployee">Update Employee</button>
+                <button class="reset-button" id="resetUpdateEmployee">Reset</button>
+                <div class="response" id="updateEmployeeResponse"></div>
+            </div>
+
+            <!-- Get Highest Sale by Date -->
+            <div class="endpoint">
+                <h2>Get Highest Sale by Date</h2>
+                <input type="date" id="highestSaleDate">
+                <button id="getHighestSaleByDate">Get Highest Sale</button>
+                <button class="reset-button" id="resetHighestSaleDate">Reset</button>
+                <div class="response" id="highestSaleResponse"></div>
+            </div>
+
+            <!-- Get Highest Sale by Year -->
+            <div class="endpoint">
+                <h2>Get Highest Sale by Year</h2>
+                <input type="number" id="highestSaleYear" placeholder="Enter Year">
+                <button id="getHighestSaleByYear">Get Highest Sale</button>
+                <button class="reset-button" id="resetHighestSaleYear">Reset</button>
+                <div class="response" id="highestSaleByYearResponse"></div>
+            </div>
+
+            <!-- Get Lowest Sale by Date -->
+            <div class="endpoint">
+                <h2>Get Lowest Sale by Date</h2>
+                <input type="date" id="lowestSaleDate">
+                <button id="getLowestSaleByDate">Get Lowest Sale</button>
+                <button class="reset-button" id="resetLowestSaleDate">Reset</button>
+                <div class="response" id="lowestSaleResponse"></div>
+            </div>
+
+            <!-- Get Lowest Sale by Year -->
+            <div class="endpoint">
+                <h2>Get Lowest Sale by Year</h2>
+                <input type="number" id="lowestSaleYear" placeholder="Enter Year">
+                <button id="getLowestSaleByYear">Get Lowest Sale</button>
+                <button class="reset-button" id="resetLowestSaleYear">Reset</button>
+                <div class="response" id="lowestSaleByYearResponse"></div>
+            </div>
+
+            <!-- Get Employee Company Sales -->
+            <div class="endpoint">
+                <h2>Get Employee Company Sales</h2>
+                <input type="number" id="employeeIdCompanySales" placeholder="Enter Employee ID">
+                <button id="getEmployeeCompanySales">Get Company Sales</button>
+                <button class="reset-button" id="resetEmployeeCompanySales">Reset</button>
+                <div class="response" id="employeeCompanySalesResponse"></div>
+            </div>
+
+            <!-- Add Employee -->
+            <div class="endpoint">
+                <h2>Add Employee</h2>
+                <textarea id="addEmployeeData" placeholder="Enter Employee Data (JSON format)"></textarea>
+                <button id="addEmployee">Add Employee</button>
+                <button class="reset-button" id="resetAddEmployee">Reset</button>
+                <div class="response" id="addEmployeeResponse"></div>
+            </div>
+
+            <!-- Update Employee -->
+            <div class="endpoint">
+                <h2>Update Employee</h2>
+                <input type="number" id="updateEmployeeId2" placeholder="Enter Employee ID">
+                <textarea id="updateEmployeeData" placeholder="Enter Employee Data (JSON format)"></textarea>
+                <button id="updateEmployee2">Update Employee</button>
+                <button class="reset-button" id="resetUpdateEmployee2">Reset</button>
+                <div class="response" id="updateEmployeeResponse2"></div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        // Function to show loading message
+        function showLoading(selector) {
+            $(selector).html('<div class="loading">Loading...</div>').show();
+        }
+
+        // Function to hide loading message
+        function hideLoading(selector) {
+            $(selector).hide();
+        }
+
+        // Function to clear results
+        function clearResults() {
+            $('.response').html('').hide();
+        }
+
+        // Function to reset input fields
+        function resetFields() {
+            $('input[type="number"], input[type="date"], textarea').val('');
+            clearResults();
+        }
+
+        // Get All Employees
+        $('#getAllEmployees').click(function () {
+            clearResults();
+            showLoading('#allEmployeesList');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `/api/employee/All-Employees`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#allEmployeesList');
+                    $('#allEmployeesList').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#allEmployeesList');
+                    $('#allEmployeesList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Sales Made by Employee Between Dates
+        $('#getSalesByEmployeeBetweenDates').click(function () {
+            clearResults();
+            const employeeId = $('#employeeIdSalesBetween').val();
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+            if (!employeeId || !fromDate || !toDate) {
+                $('#salesByEmployeeBetweenDatesList').html('Please enter employee ID and select both dates.').show();
+                return;
+            }
+            showLoading('#salesByEmployeeBetweenDatesList');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/update/${employeeId},${fromDate},${toDate}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#salesByEmployeeBetweenDatesList');
+                    $('#salesByEmployeeBetweenDatesList').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#salesByEmployeeBetweenDatesList');
+                    $('#salesByEmployeeBetweenDatesList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Patch Update Employee
+        $('#updateEmployee').click(function () {
+            clearResults();
+            const employeeId = $('#updateEmployeeId').val();
+            const employeeData = $('#employeeData').val();
+            if (!employeeId || !employeeData) {
+                $('#updateEmployeeResponse').html('Please enter employee ID and data.').show();
+                return;
+            }
+            showLoading('#updateEmployeeResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `/api/employee/${employeeId}`,
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: employeeData,
+                success: function (data) {
+                    hideLoading('#updateEmployeeResponse');
+                    $('#updateEmployeeResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#updateEmployeeResponse');
+                    $('#updateEmployeeResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+
+        // Get Highest Sale by Date
+        $('#getHighestSaleByDate').click(function () {
+            clearResults();
+            const date = $('#highestSaleDate').val();
+            if (!date) {
+                $('#highestSaleResponse').html('Please select a date.').show();
+                return;
+            }
+            showLoading('#highestSaleResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/highestSale-byDate?date=${encodeURIComponent(date)}`, // Updated: Use query parameter
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#highestSaleResponse');
+                    $('#highestSaleResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#highestSaleResponse');
+                    $('#highestSaleResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Highest Sale by Year
+        $('#getHighestSaleByYear').click(function () {
+            clearResults();
+            const year = $('#highestSaleYear').val();
+            if (!year) {
+                $('#highestSaleByYearResponse').html('Please enter a year.').show();
+                return;
+            }
+            showLoading('#highestSaleByYearResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/highestSale-byYear?year=${encodeURIComponent(year)}`, // Updated: Use query parameter
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#highestSaleByYearResponse');
+                    $('#highestSaleByYearResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#highestSaleByYearResponse');
+                    $('#highestSaleByYearResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Lowest Sale by Date
+        $('#getLowestSaleByDate').click(function () {
+            clearResults();
+            const date = $('#lowestSaleDate').val();
+            if (!date) {
+                $('#lowestSaleResponse').html('Please select a date.').show();
+                return;
+            }
+            showLoading('#lowestSaleResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/lowestSale-byDate?date=${encodeURIComponent(date)}`, // Updated: Use query parameter
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#lowestSaleResponse');
+                    $('#lowestSaleResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#lowestSaleResponse');
+                    $('#lowestSaleResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Get Lowest Sale by Year
+        $('#getLowestSaleByYear').click(function () {
+            clearResults();
+            const year = $('#lowestSaleYear').val();
+            if (!year) {
+                $('#lowestSaleByYearResponse').html('Please enter a year.').show();
+                return;
+            }
+            showLoading('#lowestSaleByYearResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/lowestSale-byYear?year=${encodeURIComponent(year)}`, // Updated: Use query parameter
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#lowestSaleByYearResponse');
+                    $('#lowestSaleByYearResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#lowestSaleByYearResponse');
+                    $('#lowestSaleByYearResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+
+        // Get Employee Company Sales
+        $('#getEmployeeCompanySales').click(function () {
+            clearResults();
+            const employeeId = $('#employeeIdCompanySales').val();
+            if (!employeeId) {
+                $('#employeeCompanySalesResponse').html('Please enter an employee ID.').show();
+                return;
+            }
+            showLoading('#employeeCompanySalesResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/${employeeId}/sales`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                success: function (data) {
+                    hideLoading('#employeeCompanySalesResponse');
+                    $('#employeeCompanySalesResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#employeeCompanySalesResponse');
+                    $('#employeeCompanySalesResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Add Employee
+        $('#addEmployee').click(function () {
+            clearResults();
+            const employeeData = $('#addEmployeeData').val();
+            if (!employeeData) {
+                $('#addEmployeeResponse').html('Please enter employee data.').show();
+                return;
+            }
+            showLoading('#addEmployeeResponse');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee`,
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: employeeData,
+                success: function (data) {
+                    hideLoading('#addEmployeeResponse');
+                    $('#addEmployeeResponse').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#addEmployeeResponse');
+                    $('#addEmployeeResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+
+        // Update Employee
+        $('#updateEmployee2').click(function () {
+            clearResults();
+            const employeeId = $('#updateEmployeeId2').val();
+            const employeeData = $('#updateEmployeeData').val();
+            if (!employeeId || !employeeData) {
+                $('#updateEmployeeResponse2').html('Please enter employee ID and data.').show();
+                return;
+            }
+            showLoading('#updateEmployeeResponse2');
+            const token = localStorage.getItem('token');
+            $.ajax({
+                url: `api/employee/update/${employeeId}`,
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: employeeData,
+                success: function (data) {
+                    hideLoading('#updateEmployeeResponse2');
+                    $('#updateEmployeeResponse2').html(formatResponse(data)).show();
+                },
+                error: function (err) {
+                    hideLoading('#updateEmployeeResponse2');
+                    $('#updateEmployeeResponse2').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                }
+            });
+        });
+        // Reset button functionality
+        $('.reset-button').click(function () {
+            resetFields();
+        });
+
+        // Function to format the response for display
+        function formatResponse(data) {
+            if (!data || data.length === 0) {
+                return 'No results found.';
+            }
+            return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+        }
+
+    </script>
 </body>
 </html>

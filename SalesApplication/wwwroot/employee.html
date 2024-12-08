@@ -262,9 +262,10 @@
 
                 // Reset all inputs and results
                 function resetFields() {
-                    $('input[type="text"], input[type="date"], input[type="number"], textarea').val('');
+                    $('input[type="text"], input[type="date"], input[type="number"]').val('');
                     clearResults();
                 }
+
 
                 // Show loading message
                 function showLoading(selector) {
@@ -294,10 +295,8 @@
                     }
                     showLoading('#employeesByRegionList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/by-region/${regionDescription}`,
-                        //url: `api/employee/by-region/${encodeURIComponent(region)}`,
+                        url: `api/employee/by-region/${encodeURIComponent(regionDescription)}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -323,9 +322,8 @@
                     }
                     showLoading('#employeesByHireDateList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/hire-date?date=${hireDate}`,
+                        url: `api/employee/by-hire-date/${hireDate}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -341,22 +339,22 @@
                     });
                 });
 
+
                 // Get Employees with Birthday on Specific Date
                 $('#getBirthdaysOnDate').click(function () {
                     clearResults();
                     const birthdayDate = $('#birthdayDate').val();
                     if (!birthdayDate) {
-                        $('#birthdaysOnDateList').html('Please select a date.').show();
+                        $('#birthdays OnDateList').html('Please select a birthday date.').show();
                         return;
                     }
                     showLoading('#birthdaysOnDateList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/birthday?date=${birthdayDate}`,
+                        url: `api/employee/birthday-by-date/${birthdayDate}`,
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}` // Include token in the request header
                         },
                         success: function (data) {
                             hideLoading('#birthdaysOnDateList');
@@ -369,14 +367,14 @@
                     });
                 });
 
+
                 // Get All Employees
                 $('#getAllEmployees').click(function () {
                     clearResults();
                     showLoading('#allEmployeesList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/all`,
+                        url: `/api/employee/All-Employees`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -402,9 +400,8 @@
                     }
                     showLoading('#employeesByCityList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/city?name=${city}`,
+                        url: `api/employee/bycity/${city}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -430,9 +427,8 @@
                     }
                     showLoading('#employeesByTitleList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/title?name=${title}`,
+                        url: `api/employee/title/${title}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -459,9 +455,8 @@
                     }
                     showLoading('#salesByEmployeeOnDateList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/${employeeId}/sales?date=${salesDate}`,
+                        url: `api/employee/${employeeId},${salesDate}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -489,9 +484,8 @@
                     }
                     showLoading('#salesByEmployeeBetweenDatesList');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/${employeeId}/sales?from=${fromDate}&to=${toDate}`,
+                        url: `api/employee/update/${employeeId},${fromDate},${toDate}`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -518,9 +512,8 @@
                     }
                     showLoading('#updateEmployeeResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/update/${employeeId}`,
+                        url: `/api/employee/${employeeId}`,
                         method: 'PATCH',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -548,9 +541,8 @@
                     }
                     showLoading('#highestSaleResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/highest-sale/by-date?date=${date}`,
+                        url: `api/employee/highestSale-byDate?date=${encodeURIComponent(date)}`, // Updated: Use query parameter
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -576,9 +568,8 @@
                     }
                     showLoading('#highestSaleByYearResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/highest-sale/by-year?year=${year}`,
+                        url: `api/employee/highestSale-byYear?year=${encodeURIComponent(year)}`, // Updated: Use query parameter
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -604,9 +595,8 @@
                     }
                     showLoading('#lowestSaleResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/lowest-sale/by-date?date=${date}`,
+                        url: `api/employee/lowestSale-byDate?date=${encodeURIComponent(date)}`, // Updated: Use query parameter
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -632,9 +622,8 @@
                     }
                     showLoading('#lowestSaleByYearResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/lowest-sale/by-year?year=${year}`,
+                        url: `api/employee/lowestSale-byYear?year=${encodeURIComponent(year)}`, // Updated: Use query parameter
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -660,9 +649,8 @@
                     }
                     showLoading('#employeeCompanySalesResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/${employeeId}/sales`,
+                        url: `api/employee/${employeeId}/sales`,
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -688,9 +676,8 @@
                     }
                     showLoading('#addEmployeeResponse');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee`,
+                        url: `api/employee`,
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -719,9 +706,8 @@
                     }
                     showLoading('#updateEmployeeResponse2');
                     const token = localStorage.getItem('token');
-                    const baseUrl = 'http://localhost:7141';
                     $.ajax({
-                        url: `${baseUrl}/api/employee/update/${employeeId}`,
+                        url: `api/employee/update/${employeeId}`,
                         method: 'PUT',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -738,6 +724,18 @@
                         }
                     });
                 });
+                // Reset button functionality
+                $('.reset-button').click(function () {
+                    resetFields();
+                });
+
+                // Function to format the response for display
+                function formatResponse(data) {
+                    if (!data || data.length === 0) {
+                        return 'No results found.';
+                    }
+                    return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+                }
             });
         </script>
 </body>

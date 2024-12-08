@@ -1,10 +1,71 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipper Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+    </style>
 </head>
 <body>
+
+    <div class="container">
+        <h1>Shipper Management</h1>
+        <button id="shipperBtn">Go to Shipper</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script>
+        document.getElementById('shipperBtn').addEventListener('click', function () {
+            window.location.href = 's_shipper.html'; // Redirect to shipper.html
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('token'); // Remove token from local storage
+            localStorage.removeItem('role'); // Remove role from local storage
+            window.location.href = 'index.html'; // Redirect to login page
+        });
+    </script>
 
 </body>
 </html>

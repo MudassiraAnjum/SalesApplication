@@ -59,9 +59,9 @@ namespace SalesApplication.Controllers
         }
 
 
-        [HttpGet("highest-sale/by-date")]
+        [HttpGet("highestSale-byDate")]
         [Authorize(Roles = "Admin,Employee")]
-        public async Task<IActionResult> GetHighestSaleByEmployeeAsync([FromQuery] DateTime date)
+        public async Task<IActionResult> GetHighestSaleByEmployeeDateAsync([FromQuery] DateTime date)
         {
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
@@ -70,9 +70,9 @@ namespace SalesApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("highest-sale/by-year")]
+        [HttpGet("highestSale-byYear")]
         [Authorize(Roles = "Admin,Employee")]
-        public async Task<IActionResult> GetHighestSaleByEmployeeAsync([FromQuery] int year)
+        public async Task<IActionResult> GetHighestSaleByEmployeeYearAsync([FromQuery] int year)
         {
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
@@ -81,9 +81,9 @@ namespace SalesApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("lowest-sale/by-date")]
+        [HttpGet("lowestSale-byDate")]
         [Authorize(Roles = "Admin,Employee")]
-        public async Task<IActionResult> GetLowestSaleByEmployeeAsync([FromQuery] DateTime date)
+        public async Task<IActionResult> GetLowestSaleByEmployeeDateAsync([FromQuery] DateTime date)
         {
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
@@ -92,9 +92,9 @@ namespace SalesApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("lowest-sale/by-year")]
+        [HttpGet("lowestSale-byYear")]
         [Authorize(Roles = "Admin,Employee")]
-        public async Task<IActionResult> GetLowestSaleByEmployeeAsync([FromQuery] int year)
+        public async Task<IActionResult> GetLowestSaleByEmployeeYearAsync([FromQuery] int year)
         {
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var employeeIdClaim = User.FindFirst("EmployeeId")?.Value;
@@ -168,7 +168,7 @@ namespace SalesApplication.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{Salesempid}")]
+        [HttpGet("{Salesempid},{date}")]
         public async Task<IActionResult> GetSalesEmployeeMadeOnDate(int Salesempid, DateTime date)
         {
             var saledate = await _employeeService.SalesMadeByEmployeeDate(Salesempid, date);
