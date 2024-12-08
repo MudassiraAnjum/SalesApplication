@@ -8,11 +8,12 @@ namespace SalesApplication.Mapper
     {
         public SalesMapperProfile()
         {
-            CreateMap<Employee, EmployeeDto>().ReverseMap();
-            CreateMap<Territory, TerritoryDto>().ReverseMap();
-            CreateMap<Shipper, ShipperDto>().ReverseMap();
-            CreateMap<ResponseShipperDto, Shipper>().ReverseMap();
-            CreateMap<Order,OrderDto>().ReverseMap();
+            CreateMap<ResponseOrderDto, Order>().ReverseMap();
+            CreateMap<Order, ShipperDetailsDto>().ReverseMap();
+            CreateMap<Order, OrdersShipDetailsDto>().ReverseMap();
+            CreateMap<Employee, OrdersByEmployeeDto>().ReverseMap();
+
+            CreateMap<ResponseOrderDetailsDto,OrderDetail>().ReverseMap();
         }
     }
 }

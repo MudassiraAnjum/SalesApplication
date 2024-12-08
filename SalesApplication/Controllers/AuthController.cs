@@ -33,17 +33,14 @@ namespace SalesApplication.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(string username, string password)
+        public IActionResult Login([FromBody] LoginDto loginDto)
         {
-            try
-            {
-                var tokenModel = _authService.Authenticate(username, password);
-                return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
-            }
-            catch (UnauthorizedAccessException)
+            var tokenModel = _authService.Authenticate(loginDto);
+            if (tokenModel.Token == null)
             {
                 return Unauthorized("Invalid username or password");
             }
+            return Ok(new { token = tokenModel.Token, role = tokenModel.Role });
         }
 
     }

@@ -46,13 +46,14 @@ namespace SalesApplication.IServices.Services
             return "Registered successfully.";
         }
 
-        public (string Token, string Role) Authenticate(string username, string password)
+        public (string Token, string Role) Authenticate(LoginDto loginDto)
         {
             string role = null;
+            int? employeeId = null;
 
             // Check in Admins
             var admins = _configuration.GetSection("Admins").Get<List<Dictionary<string, string>>>();
-            var admin = admins.FirstOrDefault(a => a["AdminName"] == username && a["Password"] == password);
+            var admin = admins.FirstOrDefault(a => a["AdminName"] == loginDto.Username && a["Password"] == loginDto.Password);
             if (admin != null)
             {
                 role = "Admin";
@@ -61,34 +62,50 @@ namespace SalesApplication.IServices.Services
             // Check in Employees
             if (role == null)
             {
-                var employee = _dbContext.Employees.FirstOrDefault(e => e.FirstName == username && e.Password == password);
-                if (employee != null) role = "Employee";
+                var employee = _dbContext.Employees.FirstOrDefault(e => e.FirstName == loginDto.Username && e.Password == loginDto.Password);
+                if (employee != null)
+                {
+                    role = "Employee";
+                    employeeId = employee.EmployeeId; // Get EmployeeId
+                }
             }
 
             // Check in Shippers
             if (role == null)
             {
-                var shipper = _dbContext.Shippers.FirstOrDefault(s => s.CompanyName == username && s.Password == password);
+                var shipper = _dbContext.Shippers.FirstOrDefault(s => s.CompanyName == loginDto.Username && s.Password == loginDto.Password);
                 if (shipper != null) role = "Shipper";
             }
 
             if (role == null)
                 return (null, null); // Invalid credentials
 
-            var token = GenerateJwtToken(username, role);
+            var token = GenerateJwtToken(loginDto.Username, role, employeeId);
             return (token, role);
         }
 
-        private string GenerateJwtToken(string username, string role)
+        private string GenerateJwtToken(string username, string role, int? employeeId = null, string firstName = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
-        };
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            // Add EmployeeId claim if the role is Employee
+            if (role == "Employee" && employeeId.HasValue)
+            {
+                claims.Add(new Claim("EmployeeId", employeeId.Value.ToString()));
+            }
+
+            // Add firstname claim if provided
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                claims.Add(new Claim("firstname", firstName));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
