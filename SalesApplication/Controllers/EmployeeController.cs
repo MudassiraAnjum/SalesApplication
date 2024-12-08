@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SalesApplication.Dto;
 using SalesApplication.IServices;
 using SalesApplication.IServices.Services;
 
@@ -27,7 +28,7 @@ namespace SalesApplication.Controllers
             return Ok(deleteEmp);
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("lowestsalebyemployee/{year}")]
         public async Task<IActionResult> GetLowestSaleByEmpOnYearAsync(int year)
         {
@@ -35,7 +36,7 @@ namespace SalesApplication.Controllers
             return Ok(getByYear);
         }
 
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("Salemadebyanemployeebetweendates/{EmployeeId}/{fromdate}/{todate}")]
         public async Task<IActionResult> GetSalesMadeByEmployeeBetweenDatesAsync(int EmployeeId, DateTime fromdate, DateTime todate)
         {
@@ -48,6 +49,14 @@ namespace SalesApplication.Controllers
 
                 return Ok(salesData);
         }
+
+        //[Authorize(Roles = "Admin,Employee")]
+        //[HttpGet("All-Employees")]
+        //public async Task<ActionResult<IEnumerable<ResponseEmployeeDto>>> GetAllEmployees()
+        //{
+        //    var employees = await employeeService.GetAllEmployeesAsync();
+        //    return Ok(employees);
+        //}
 
     }
 }

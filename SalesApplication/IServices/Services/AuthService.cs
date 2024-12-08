@@ -49,6 +49,7 @@ namespace SalesApplication.IServices.Services
         public (string Token, string Role) Authenticate(string username, string password)
         {
             string role = null;
+            int? shipperId = null;
 
             // Check in Admins
             var admins = _configuration.GetSection("Admins").Get<List<Dictionary<string, string>>>();
@@ -69,26 +70,49 @@ namespace SalesApplication.IServices.Services
             if (role == null)
             {
                 var shipper = _dbContext.Shippers.FirstOrDefault(s => s.CompanyName == username && s.Password == password);
-                if (shipper != null) role = "Shipper";
+                if (shipper != null)
+                {
+                    role = "Shipper";
+                    shipperId = shipper.ShipperId; // Assign ShipperId
+                }
             }
 
             if (role == null)
                 return (null, null); // Invalid credentials
 
-            var token = GenerateJwtToken(username, role);
+            var token = GenerateJwtToken(username, role, shipperId);
             return (token, role);
         }
 
-        private string GenerateJwtToken(string username, string role)
+
+        private string GenerateJwtToken(string username, string role, int? shipperId = null, int? employeeId = null, string firstName = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
-        };
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            // Add EmployeeId claim if the role is Employee
+            if (role == "Employee" && employeeId.HasValue)
+            {
+                claims.Add(new Claim("EmployeeId", employeeId.Value.ToString()));
+            }
+
+            // Add firstname claim if provided
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                claims.Add(new Claim("firstname", firstName));
+            }
+
+            // Add ShipperId claim if the role is Shipper
+            if (role == "Shipper" && shipperId.HasValue)
+            {
+                claims.Add(new Claim("ShipperId", shipperId.Value.ToString()));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
@@ -99,5 +123,6 @@ namespace SalesApplication.IServices.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

@@ -30,25 +30,8 @@ namespace SalesApplication.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllShipper()
         {
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userName = User.Identity?.Name;
-
-            if (userRole == "Shipper")
-            {
-                // Fetch only the logged-in shipper's details
-                var shipper = await _shipperService.GetShipperByCompanyName(userName);
-
-                if (shipper == null)
-                {
-                    return NotFound("No details found for the logged-in shipper.");
-                }
-
-                return Ok(shipper);
-            }
-
-            // If Admin, fetch all shippers
-            var allShippers = await _shipperService.GetAllShipper();
-            return Ok(allShippers);
+            var getAll = await _shipperService.GetAllShipper();
+            return Ok(getAll);
         }
 
 
@@ -77,7 +60,7 @@ namespace SalesApplication.Controllers
         }
 
 
-        [Authorize(Roles="Admin,Shipper")]
+        [Authorize(Roles = "Admin,Shipper")]
         [HttpPatch("edit/{shipperId}")]
         public async Task<IActionResult> UpdateShipper(int shipperId, [FromBody] JsonPatchDocument<ShipperUpdateDto> patchDoc)
         {
@@ -86,32 +69,10 @@ namespace SalesApplication.Controllers
                 return BadRequest("Invalid input data.");
             }
 
-            // Get the logged-in user's role and username
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            var userName = User.Identity?.Name;  // Assuming userName is the CompanyName for the Shipper role
-
-            // If the logged-in user is a shipper, check if the user is trying to update their own data
-            if (userRole == "Shipper" && userName != null)
-            {
-                // Fetch the shipper data by shipperId to compare
-                var shipper = await _shipperService.GetShipperById(shipperId);
-
-                if (shipper == null)
-                {
-                    return NotFound("Shipper not found.");
-                }
-
-                // Ensure the logged-in shipper can only update their own data
-                if (shipper.CompanyName != userName)
-                {
-                    return Forbid("You cannot update another shipper's data.");
-                }
-            }
-
-            // Call the service to update the shipper with the patch document
+            // Call the service to handle the update logic
             await _shipperService.UpdateShipperAsync(shipperId, patchDoc);
-            return NoContent(); // Success, no content to return
 
+            return NoContent(); // Return 204 No Content on successful update
         }
 
     }

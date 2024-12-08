@@ -7,5 +7,6 @@ namespace SalesApplication.IServices
         Task<EmployeeDto> DeleteEmployee(int id);
         Task<EmployeeDto> GetLowestSaleByEmpInYearAsync(int year);
         Task<List<EmployeeSalesDto>> GetSalesMadeByEmployeeBetweenDatesAsync(int employeeId, DateTime fromDate, DateTime toDate);
+        //Task<IEnumerable<ResponseEmployeeDto>> GetAllEmployeesAsync();
     }
 }

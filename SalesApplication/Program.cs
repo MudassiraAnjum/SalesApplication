@@ -29,6 +29,7 @@ namespace SalesApplication
             builder.Services.AddControllers().AddNewtonsoftJson();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddHttpContextAccessor();
 
             // Add JWT Authentication
             var secretKey = builder.Configuration["Jwt:Key"];
