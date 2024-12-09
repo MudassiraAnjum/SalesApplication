@@ -12,12 +12,10 @@ namespace SalesApplication.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService employeeService;
-        //IEmployeeService i;
 
         public EmployeeController(IEmployeeService _employeeService)
         {
             employeeService = _employeeService;
-            //i = new EmployeeService();
         }
 
         [Authorize(Roles = "Admin")]
@@ -28,11 +26,11 @@ namespace SalesApplication.Controllers
             return Ok(deleteEmp);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Employee")]
         [HttpGet("lowestsalebyemployee/{year}")]
         public async Task<IActionResult> GetLowestSaleByEmpOnYearAsync(int year)
         {
-            var getByYear= await employeeService.GetLowestSaleByEmpInYearAsync(year);
+            var getByYear= await employeeService.GetLowestSaleByEmployeeAsync(year);
             return Ok(getByYear);
         }
 
@@ -49,14 +47,5 @@ namespace SalesApplication.Controllers
 
                 return Ok(salesData);
         }
-
-        //[Authorize(Roles = "Admin,Employee")]
-        //[HttpGet("All-Employees")]
-        //public async Task<ActionResult<IEnumerable<ResponseEmployeeDto>>> GetAllEmployees()
-        //{
-        //    var employees = await employeeService.GetAllEmployeesAsync();
-        //    return Ok(employees);
-        //}
-
     }
 }

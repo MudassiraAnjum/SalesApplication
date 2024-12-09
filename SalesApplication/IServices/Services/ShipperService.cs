@@ -110,14 +110,7 @@ namespace SalesApplication.IServices.Services
             // Save changes to the database
             await _context.SaveChangesAsync();
         }
-        //public async Task<ResponseShipperDto?> GetShipperByCompanyName(string companyName)
-        //    {
-        //        var shipper = await _context.Shippers.FirstOrDefaultAsync(s => s.CompanyName == companyName);
 
-        //        if (shipper == null) return null;
-
-        //        return _mapper.Map<ResponseShipperDto>(shipper);
-        //    }
         public async Task<List<ShipperEarningsDto>> GetEarningsByShipperAndDateAsync(string companyName, DateTime date)
         {
             var earnings = await _context.OrderDetails
@@ -138,14 +131,6 @@ namespace SalesApplication.IServices.Services
 
             return earnings;
         }
-
-        //public async Task<Shipper> GetShipperById(int shipperId)
-        //{
-        //    // Retrieve the shipper by their ID
-        //    return await _context.Shippers
-        //                         .Where(s => s.ShipperId == shipperId)
-        //                         .FirstOrDefaultAsync();
-        //}
     }
 }
 

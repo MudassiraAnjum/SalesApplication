@@ -50,6 +50,7 @@ namespace SalesApplication.IServices.Services
         {
             string role = null;
             int? shipperId = null;
+            int? employeeId = null;
 
             // Check in Admins
             var admins = _configuration.GetSection("Admins").Get<List<Dictionary<string, string>>>();
@@ -63,7 +64,11 @@ namespace SalesApplication.IServices.Services
             if (role == null)
             {
                 var employee = _dbContext.Employees.FirstOrDefault(e => e.FirstName == username && e.Password == password);
-                if (employee != null) role = "Employee";
+                if (employee != null)
+                {
+                    role = "Employee";
+                    employeeId = employee.EmployeeId;
+                }
             }
 
             // Check in Shippers
@@ -80,7 +85,7 @@ namespace SalesApplication.IServices.Services
             if (role == null)
                 return (null, null); // Invalid credentials
 
-            var token = GenerateJwtToken(username, role, shipperId);
+            var token = GenerateJwtToken(username, role, shipperId,employeeId);
             return (token, role);
         }
 

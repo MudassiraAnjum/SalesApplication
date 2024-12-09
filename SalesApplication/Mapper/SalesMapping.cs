@@ -9,6 +9,7 @@ namespace SalesApplication.Mapper
         public SalesMapping()
         {
             CreateMap<Employee, EmployeeDto>().ReverseMap();
+            CreateMap<Employee, ResponseEmployeeDto>().ReverseMap();
             CreateMap<Territory, TerritoryDto>().ReverseMap();
             CreateMap<Shipper, ShipperDto>().ReverseMap();
             CreateMap<ResponseShipperDto, Shipper>().ReverseMap();

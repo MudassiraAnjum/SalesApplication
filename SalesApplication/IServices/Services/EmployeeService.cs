@@ -37,10 +37,18 @@ namespace SalesApplication.IServices.Services
             return _mapper.Map<EmployeeDto>(deleteEmp);
         }
 
-        public async Task<EmployeeDto> GetLowestSaleByEmpInYearAsync(int year)
+        public async Task<ResponseEmployeeDto> GetLowestSaleByEmployeeAsync(int year)
         {
-            var sales = await _context.OrderDetails
-            .Include(od => od.Order)
+            var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+            var employeeIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("EmployeeId")?.Value;
+
+            if (!int.TryParse(employeeIdClaim, out var loggedInEmployeeId))
+            {
+                loggedInEmployeeId = 0;
+            }
+
+            var employeeSales = await _context.OrderDetails
+                .Include(od => od.Order)
                 .Where(od => od.Order.OrderDate.HasValue && od.Order.OrderDate.Value.Year == year)
                 .GroupBy(od => od.Order.EmployeeId)
                 .Select(g => new
@@ -48,16 +56,34 @@ namespace SalesApplication.IServices.Services
                     EmployeeId = g.Key,
                     TotalSale = g.Sum(od =>
                         od.UnitPrice *
-                        (decimal)od.Quantity *  // Convert Quantity to decimal for multiplication
-                        (1 - (decimal)od.Discount))  // Convert Discount to decimal
+                        (decimal)od.Quantity *
+                        (1 - (decimal)od.Discount))
                 })
-                .OrderBy(x => x.TotalSale)
-                .FirstOrDefaultAsync();
+                .ToListAsync();
 
-            if (sales == null) return null; // No sales found for that date
+            if (employeeSales == null || !employeeSales.Any())
+            {
+                throw new KeyNotFoundException($"No sales found for the year '{year}'.");
+            }
 
-            var employee = await _context.Employees.FindAsync(sales.EmployeeId);
-            return _mapper.Map<EmployeeDto>(employee);
+            if (userRole == "Employee")
+            {
+
+                var loggedInEmployeeSales = employeeSales.FirstOrDefault(s => s.EmployeeId == loggedInEmployeeId);
+
+                if (loggedInEmployeeSales == null)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to view this data.");
+                }
+
+                var loggedInEmployee = await _context.Employees.FindAsync(loggedInEmployeeId);
+                return _mapper.Map<ResponseEmployeeDto>(loggedInEmployee);
+            }
+
+            var highestSale = employeeSales.OrderBy(s => s.TotalSale).First();
+            var highestEmployee = await _context.Employees.FindAsync(highestSale.EmployeeId);
+
+            return _mapper.Map<ResponseEmployeeDto>(highestEmployee);
         }
 
         public async Task<List<EmployeeSalesDto>> GetSalesMadeByEmployeeBetweenDatesAsync(int employeeId, DateTime fromDate, DateTime toDate)
@@ -77,28 +103,28 @@ namespace SalesApplication.IServices.Services
             return salesData;
         }
 
-        //public async Task<IEnumerable<ResponseEmployeeDto>> GetAllEmployeesAsync()
-        //{
-        //    var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
-        //    var employeeIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("EmployeeId")?.Value;
+        public async Task<IEnumerable<ResponseEmployeeDto>> GetAllEmployeesAsync()
+        {
+            var userRole = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+            var employeeIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("EmployeeId")?.Value;
 
-        //    if (userRole == "Employee" && int.TryParse(employeeIdClaim, out var employeeId))
-        //    {
-        //        var employee = await _context.Employees.FindAsync(employeeId);
-        //        if (employee != null)
-        //        {
-        //            return new List<ResponseEmployeeDto> { _mapper.Map<ResponseEmployeeDto>(employee) };
-        //        }
-        //        throw new KeyNotFoundException($"Employee with ID: {employeeId} not found.");
-        //    }
-        //    if (userRole == "Admin")
-        //    {
-        //        var employees = await _context.Employees.ToListAsync();
-        //        return _mapper.Map<IEnumerable<ResponseEmployeeDto>>(employees);
-        //    }
+            if (userRole == "Employee" && int.TryParse(employeeIdClaim, out var employeeId))
+            {
+                var employee = await _context.Employees.FindAsync(employeeId);
+                if (employee != null)
+                {
+                    return new List<ResponseEmployeeDto> { _mapper.Map<ResponseEmployeeDto>(employee) };
+                }
+                throw new KeyNotFoundException($"Employee with ID: {employeeId} not found.");
+            }
+            if (userRole == "Admin")
+            {
+                var employees = await _context.Employees.ToListAsync();
+                return _mapper.Map<IEnumerable<ResponseEmployeeDto>>(employees);
+            }
 
-        //    throw new UnauthorizedAccessException("You do not have permission to access this resource.");
-        //}
+            throw new UnauthorizedAccessException("You do not have permission to access this resource.");
+        }
     }
 }
 
