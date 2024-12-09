@@ -101,14 +101,6 @@
     <div class="container scrollable">
         <h1>Order Management</h1>
 
-        <!-- Get All Orders -->
-        <!--<div class="endpoint">
-            <h2>Get All Orders</h2>
-            <button id="getAllOrders">Get All Orders</button>
-            <div class="response" id="allOrdersList"></div>
-        </div>-->
-
-
         <!-- Get All Shipping Details -->
         <div class="endpoint">
             <h2>Get All Shipping Details</h2>
@@ -145,11 +137,6 @@
                 $(selector).html('<div class="loading">Loading ...</div>').show();
             }
 
-            // Hide loading message
-            function hideLoading(selector) {
-                $(selector).hide();
-            }
-
             // Format response for display
             function formatResponse(data) {
                 if (!data || data.length === 0) {
@@ -157,46 +144,22 @@
                 }
                 return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
             }
-            function getAllOrders() {
-                const button = $('#fetchOrdersBtn');
-                button.prop('disabled', true); // Disable button during API call
-                $('#ordersOutput').html('<div class="loading">Loading...</div>');
 
-                $.ajax({
-                    url: 'api/order', // Endpoint to get all orders
-                    method: 'GET',
-                    headers: {
-                        'Authorization': Bearer ${ localStorage.getItem('token') }  // Use the token in the Authorization header
-        },
-            success: (response) => {
-                $('#ordersOutput').html(<pre>${JSON.stringify(response, null, 2)}</pre>);
-            },
-                error: (xhr) => {
-                    const errorMessage = xhr.responseJSON?.message || 'Error fetching orders';
-                    $('#ordersOutput').html(<p style="color: red;">${errorMessage}</p>);
-                },
-                    complete: () => {
-                        button.prop('disabled', false); // Re-enable button
-                    }
-        });
-}
             // Get All Shipping Details
             $('#getAllShippingDetails').click(function () {
                 clearResults();
                 showLoading('#allShippingDetailsList');
                 const token = localStorage.getItem('token');
                 $.ajax({
-                    url: `api/order/allShipDetails`,
+                    url: 'api/order/allShipDetails',
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },
                     success: function (data) {
-                        hideLoading('#allShippingDetailsList');
                         $('#allShippingDetailsList').html(formatResponse(data)).show();
                     },
                     error: function (err) {
-                        hideLoading('#allShippingDetailsList');
                         $('#allShippingDetailsList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
                     }
                 });
@@ -220,11 +183,9 @@
                         'Authorization': `Bearer ${token}`
                     },
                     success: function (data) {
-                        hideLoading('#shippingDetailsBetweenDatesList');
                         $('#shippingDetailsBetweenDatesList').html(formatResponse(data)).show();
                     },
                     error: function (err) {
-                        hideLoading('#shippingDetailsBetweenDatesList');
                         $('#shippingDetailsBetweenDatesList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
                     }
                 });
@@ -236,17 +197,15 @@
                 showLoading('#numberOfOrdersByEmployeeList');
                 const token = localStorage.getItem('token');
                 $.ajax({
-                    url: `api/order/numberoforderbyeachemployee`,
+                    url: 'api/order/numberoforderbyeachemployee',
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     },
                     success: function (data) {
-                        hideLoading('#numberOfOrdersByEmployeeList');
                         $('#numberOfOrdersByEmployeeList').html(formatResponse(data)).show();
                     },
                     error: function (err) {
-                        hideLoading('#numberOfOrdersByEmployeeList');
                         $('#numberOfOrdersByEmployeeList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
                     }
                 });
