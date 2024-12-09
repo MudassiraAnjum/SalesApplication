@@ -24,7 +24,7 @@ namespace SalesApplication.Controllers
         }
 
         [Authorize(Roles = "Employee")]
-        [HttpGet("employee/{firstName}")]
+        [HttpGet("byemployee/{firstName}")]
         public async Task<ActionResult<IEnumerable<ResponseOrderDto>>> GetOrdersByEmployee(string firstName)
         {
             var orders = await _orderService.GetOrdersByEmpFNameAsync(firstName);

@@ -140,7 +140,7 @@
                 showLoading('#allOrdersList');
                 const token = localStorage.getItem('token');
                 $.ajax({
-                    url: `api/order/employee/{firstName}`,
+                    url: `api/order/byemployee/{firstName}`,
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
