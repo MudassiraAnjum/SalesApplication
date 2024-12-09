@@ -17,11 +17,33 @@
             return response.json(); // Parse the response as JSON
         })
         .then(data => {
-            let output = "<h2>Territories:</h2><ul>";
+            // Generate table
+            let output = `
+                <h2>Territories</h2>
+                <table border="1" style="border-collapse: collapse; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
             data.forEach(territory => {
-                output += `<li><strong>ID:</strong> ${territory.territoryId}<br><strong>Description:</strong> ${territory.territoryDescription}</li>`;
+                output += `
+                    <tr>
+                        <td>${territory.territoryId}</td>
+                        <td>${territory.territoryDescription}</td>
+                    </tr>
+                `;
             });
-            output += "</ul>";
+
+            output += `
+                    </tbody>
+                </table>
+            `;
+
             document.getElementById("territoriesResult").innerHTML = output;
         })
         .catch(error => {

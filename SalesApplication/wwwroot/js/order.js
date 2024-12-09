@@ -26,7 +26,33 @@
             if (data.length === 0) {
                 document.getElementById("ordersResult").innerHTML = "No orders found for this employee.";
             } else {
-                document.getElementById("ordersResult").innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                // Generate table
+                let table = `<table border="1" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>`;
+
+                // Add headers dynamically based on the keys of the first object
+                Object.keys(data[0]).forEach(key => {
+                    table += `<th style="padding: 8px; text-align: left; background-color: #f2f2f2;">${key}</th>`;
+                });
+
+                table += `</tr>
+                                </thead>
+                                <tbody>`;
+
+                // Add rows for each object
+                data.forEach(order => {
+                    table += `<tr>`;
+                    Object.values(order).forEach(value => {
+                        table += `<td style="padding: 8px; text-align: left;">${value}</td>`;
+                    });
+                    table += `</tr>`;
+                });
+
+                table += `</tbody></table>`;
+
+                // Insert table into the existing ordersResult div
+                document.getElementById("ordersResult").innerHTML = table;
             }
         })
         .catch(error => {
