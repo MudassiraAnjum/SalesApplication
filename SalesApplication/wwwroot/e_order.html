@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .scrollable {
+            overflow-y: auto;
+            max-height: 100vh; /* Set max height to the viewport height */
+            padding-bottom: 20px; /* Add some padding to the bottom */
+        }
+
+        .container {
+            background-color: #1e1e1e; /* Dark gray background for the container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 800px; /* Increased width for more space */
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5722; /* Orange color */
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 90%;
+            padding: 10px;
+            background-color: #ff5722; /* Orange color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #e64a19; /* Darker orange */
+            }
+
+        .response {
+            background-color: #2e2e2e; /* Dark gray background for the response container */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            overflow-y: auto; /* Add scrollbar if content exceeds max height */
+            margin-top: 20px;
+        }
+
+        .endpoint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input, select, textarea {
+            background-color: #3a3a3a; /* Darker input background */
+            color: #fff; /* White text in inputs */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 90%;
+        }
+
+            input:focus, select:focus, textarea:focus {
+                outline: none;
+                box-shadow: 0 0 2px 1px #ff5722;
+            }
+
+        .loading {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container scrollable">
+        <h1>Order Management</h1>
+
+        <!-- Get Orders by Employee FirstName -->
+        <div class="endpoint">
+            <h2>Get Orders by Employee by First Name</h2>
+            <input type="text" id="employeeFirstName" placeholder="Enter Employee First Name">
+            <button id="getOrdersByEmployee">Get Orders</button>
+            <div class="response" id="ordersByEmployeeList"></div>
+        </div>    
+    </div>
+    <script>
+        $(document).ready(function () {
+            // Clear previous results
+            function clearResults() {
+                $('.response').html('').hide();
+            }
+
+            // Show loading message
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading ...</div>').show();
+            }
+
+            // Hide loading message
+            function hideLoading(selector) {
+                $(selector).hide();
+            }
+
+            // Format response for display
+            function formatResponse(data) {
+                if (!data || data.length === 0) {
+                    return 'No results found.';
+                }
+                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+            }
+
+            // Get All Orders by Employee Name
+            $('#getAllOrders').click(function () {
+                clearResults();
+                showLoading('#allOrdersList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `api/order/byemployee/{firstName}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (data) {
+                        hideLoading('#allOrdersList');
+                        $('#allOrdersList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#allOrdersList');
+                        $('#allOrdersList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
