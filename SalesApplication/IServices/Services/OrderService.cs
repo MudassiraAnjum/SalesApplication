@@ -61,10 +61,6 @@ namespace Sales_Application.IServices
 
             return orderDto; // Return the mapped OrderDto
         }
-
-
-
-
     }
 }
 

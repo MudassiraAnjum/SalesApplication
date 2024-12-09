@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e8f5e9; /* Light green background */
+            color: #2e7d32; /* Dark green text */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 8px;
+            background-color: #c8e6c9;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0 20px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #388e3c;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #2e7d32;
+            margin-top: 20px;
+        }
+
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        input {
+            border: 1px solid #388e3c;
+        }
+
+        button {
+            background-color: #388e3c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #2e7d32;
+            }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+            ul li {
+                background-color: #f1f8e9;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+            }
+
+        #dashboard button {
+            margin: 5px 0;
+        }
+
+        #employee-title-section,
+        #highest-sales-date-section,
+        #highest-sales-year-section,
+        #sales-by-employee-section {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome Employee!</h2>
+        <div id="dashboard">
+            <button id="get-employee-title">Get Employees by Title</button>
+            <button id="get-highest-sales-date">Get Highest Sales by Date</button>
+            <button id="get-highest-sales-year">Get Highest Sales by Year</button>
+            <button id="get-sales-by-employee">Get Sales by Employee</button>
+        </div>
+
+        <!-- Employee Title Section -->
+        <div id="employee-title-section">
+            <h3>Employees by Title</h3>
+            <input type="text" id="employee-title-input" placeholder="Enter title to search">
+            <button id="search-title-btn">Search</button>
+            <ul id="employee-title-list"></ul>
+        </div>
+
+        <!-- Highest Sales by Date Section -->
+        <div id="highest-sales-date-section">
+            <h3>Highest Sales on Date</h3>
+            <input type="date" id="sales-date-input">
+            <button id="get-sales-by-date-btn">Get Sales</button>
+            <ul id="highest-sales-date-list"></ul>
+        </div>
+
+        <!-- Highest Sales by Year Section -->
+        <div id="highest-sales-year-section">
+            <h3>Highest Sales in Year</h3>
+            <input type="number" id="sales-year-input" placeholder="Enter year">
+            <button id="get-sales-by-year-btn">Get Sales</button>
+            <ul id="highest-sales-year-list"></ul>
+        </div>
+
+        <!-- Sales by Employee Section -->
+        <div id="sales-by-employee-section">
+            <h3>Sales by Employee on Date</h3>
+            <input type="number" id="employee-id-input" placeholder="Enter Employee ID">
+            <input type="date" id="employee-sales-date-input">
+            <button id="get-employee-sales-btn">Get Sales</button>
+            <ul id="employee-sales-list"></ul>
+        </div>
+    </div>
+
+    <script src="Employee.js"></script>
+</body>
+</html>

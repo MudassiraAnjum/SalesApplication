@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e8f5e9; /* Light green background */
+            color: #2e7d32; /* Dark green text */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 8px;
+            background-color: #c8e6c9;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0 20px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #388e3c;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 1em;
+            margin-right: 10px;
+            text-align: left;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #388e3c;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        textarea {
+            padding: 10px;
+            border: 1px solid #388e3c;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #388e3c;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+            button:hover {
+                background-color: #2e7d32;
+            }
+
+        #territory-response {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <h2>Welcome to Sales Hub!</h2>
+        <div id="auth-buttons">
+
+            <p>Your one-stop solution for managing sales.</p>
+            <!--<p>Login if you are an Existing User:</p>-->
+            <button id="new-shipper-btn" class="btn">Register as New Shipper</button>
+            <button id="login-btn" class="btn">Login to Your Account</button>
+        </div>
+
+        <!-- Login Form Section -->
+        <div id="login-section" style="display: none;">
+            <h2>Login</h2>
+            <p>Please enter your credentials to log in.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p id="login-response"></p>
+        </div>
+
+        <!-- Register Form Section -->
+        <div id="register-section" style="display: none;">
+            <h2>Register</h2>
+            <p>Register With Us...</p>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-company">Company Name:</label>
+                    <input type="text" id="register-company" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <p id="register-response"></p>
+        </div>
+
+        <!-- Logout Button (Initially Hidden) -->
+        <button id="logout-btn" style="display: none;" onclick="logout()">Logout</button>
+    </div>
+    <!--<script src="auth.js?v=1.0.1"></script>-->
+
+    <script src="Auth.js"></script>
+</body>
+</html>

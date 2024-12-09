@@ -18,7 +18,6 @@ namespace Sales_Application.IServices.Services
             _mapper = mapper;
         }
 
-
         public async Task<TerritoryResponseDto> UpdateTerritoryAsync(string territoryId, TerritoryUpdateDto territoryDto)
         {
            
@@ -36,9 +35,9 @@ namespace Sales_Application.IServices.Services
                 await _context.SaveChangesAsync(); // Saving changes
 
                 return _mapper.Map<TerritoryResponseDto>(territory); // Returning updated territory
-            }
-            
         }
+            
+    }
 
     
 }

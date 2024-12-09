@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Shipper Information</title>
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-section input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .form-section button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            .form-section button:hover {
+                background-color: #45a049;
+            }
+
+        .error-message {
+            color: #45a049;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Order Shipper Information</h1>
+
+        <!-- Get Order Shipper Details by Date Range -->
+        <div class="form-section">
+            <h2>Get Order Shipper Details Between Dates</h2>
+            <input type="date" id="fromDate" required>
+            <input type="date" id="toDate" required>
+            <button id="getOrdersBtn">Get Orders</button>
+            <div id="ordersInfo" class="result-section"></div>
+        </div>
+
+        <!-- Get Order Shipper Details by Order ID -->
+        <div class="form-section">
+            <h2>Get Order Shipper Details by Order ID</h2>
+            <input type="number" id="orderId" placeholder="Enter Order ID" required>
+            <button id="getOrderBtn">Get Order Info</button>
+            <div id="orderInfo" class="result-section"></div>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        const apiBaseUrl = 'http://localhost:7141/api/Order'; // Update with actual API base URL
+
+        // Get Order Shipper Details by Date Range
+        $('#getOrdersBtn').click(function () {
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+            if (!fromDate || !toDate) {
+                $('#errorMessage').text('Please enter both from and to dates.');
+                return;
+            }
+
+            // Make the API request to get orders
+            fetch(`${apiBaseUrl}/BetweenDate/${fromDate}/${toDate}`, {
+                method: 'GET',
+                // No authentication required
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const ordersInfo = data.map(order => `
+                                <p><strong>Ship Name:</strong> ${order.shipName}</p>
+                                <p><strong>Ship Address:</strong> ${order.shipAddress}</p>
+                                <p><strong>Ship Region:</strong> ${order.shipRegion}</p>
+                                <hr>
+                            `).join('');
+                    $('#ordersInfo').html(ordersInfo);
+                })
+                .catch(err => {
+                    $('#errorMessage').text();
+                });
+        });
+
+        // Get Order Shipper Details by Order ID
+        $('#getOrderBtn').click(function () {
+            const orderId = $('#orderId').val();
+            if (!orderId) {
+                $('#errorMessage').text('Please enter an order ID.');
+                return;
+            }
+
+            // Make the API request to get order by ID
+            fetch(`${apiBaseUrl}/shipdetails/${orderId}`, {
+                method: 'GET',
+                // No authentication required
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const orderInfo = `
+                                <p><strong>Order ID:</strong> ${data.orderId}</p>
+                                <p><strong>Ship Name:</strong> ${data.shipName}</p>
+                                <p><strong>Ship Address:</strong> ${data.shipAddress}</p>
+                                <p><strong>Ship Region:</strong> ${data.shipRegion}</p>
+                            `;
+                    $('#orderInfo').html(orderInfo);
+                })
+                .catch(err => {
+                    $('#errorMessage').text();
+                });
+        });
+    </script>
+
+</body>
+</html>

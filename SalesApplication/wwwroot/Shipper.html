@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipper Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+            .form-section input {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+
+            .form-section button {
+                width: 100%;
+                padding: 10px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+                .form-section button:hover {
+                    background-color: #45a049;
+                }
+
+        .result-section {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shipper Management</h1>
+
+        <!-- Get Shipper Details -->
+        <div class="form-section">
+            <h2>Get Shipper Details by Company Name</h2>
+            <input type="text" id="companyName" placeholder="Enter Company Name" required>
+            <button id="getShipperBtn">Get Shipper Info</button>
+            <div id="shipperInfo" class="result-section"></div>
+        </div>
+
+        <!-- Get Total Earnings by Year -->
+        <div class="form-section">
+            <h2>Get Total Earnings by Year</h2>
+            <input type="number" id="year" placeholder="Enter Year" required>
+            <button id="getEarningsBtn">Get Total Earnings</button>
+            <div id="earningsInfo" class="result-section"></div>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script src="Shipper.js"></script>
+</body>
+</html>
