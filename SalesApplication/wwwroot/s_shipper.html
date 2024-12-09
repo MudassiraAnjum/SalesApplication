@@ -155,7 +155,7 @@
                 clearResults();
                 const shipperId = $('#updateShipperId').val();
                 const shipperDto = {
-                    companyName: $('#updateCompanyName').val(),  // Use companyName to match the backend DTO
+                    companyName: $('#updateCompanyName').val(),
                     phone: $('#updateShipperPhone').val(),
                     email: $('#updateShipperEmail').val(),
                     password: $('#updateShipperPassword').val()
@@ -164,7 +164,7 @@
                 const token = localStorage.getItem('token');
                 showLoading('#updateShipperResponse');
                 $.ajax({
-                    url: `/api/shipper/${shipperId}`,  // Ensure this matches your backend API route
+                    url: `/api/shipper/${shipperId}`,
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -181,7 +181,6 @@
                     }
                 });
             });
-
 
             // Update Shipper Details (JSON Patch)
             $('#updateShipperDetails').click(function () {
@@ -212,8 +211,39 @@
                 });
             });
 
-            function clearResults() {
-                $('.response').html('').hide();
+            // Format the response data into an HTML table
+            function formatResponse(data) {
+                if (Array.isArray(data)) {
+                    // If the data is an array (e.g., list of shippers), create a table for it
+                    let table = '<table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">';
+                    table += '<tr><th>Shipper ID</th><th>Company Name</th><th>Phone</th><th>Email</th></tr>'; // Table headers
+
+                    data.forEach(shipper => {
+                        table += `<tr>
+                                    <td>${shipper.id}</td>
+                                    <td>${shipper.companyName}</td>
+                                    <td>${shipper.phone}</td>
+                                    <td>${shipper.email}</td>
+                                  </tr>`;
+                    });
+
+                    table += '</table>';
+                    return table;
+                } else {
+                    // If the data is a single object (e.g., response for updating a shipper), format it as a simple table
+                    let table = '<table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">';
+                    for (const key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            table += `<tr><td><strong>${key}</strong></td><td>${data[key]}</td></tr>`;
+                        }
+                    }
+                    table += '</table>';
+                    return table;
+                }
+            }
+
+            function clearResults(selector = '.response') {
+                $(selector).html('').hide();
             }
 
             function showLoading(selector) {
@@ -223,10 +253,7 @@
             function hideLoading(selector) {
                 $(selector).find('.loading').remove();
             }
-
-            function formatResponse(data) {
-                return JSON.stringify(data, null, 2);
-            }
         </script>
+
 </body>
 </html>

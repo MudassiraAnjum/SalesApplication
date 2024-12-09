@@ -107,7 +107,7 @@
             <input type="text" id="employeeFirstName" placeholder="Enter Employee First Name">
             <button id="getOrdersByEmployee">Get Orders</button>
             <div class="response" id="ordersByEmployeeList"></div>
-        </div>    
+        </div>
     </div>
     <script>
         $(document).ready(function () {
@@ -126,12 +126,31 @@
                 $(selector).hide();
             }
 
-            // Format response for display
+            // Format response for display in table format
             function formatResponse(data) {
                 if (!data || data.length === 0) {
                     return 'No results found.';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+
+                let table = '<table border="1"><thead><tr>';
+
+                // Add table headers
+                for (let key in data[0]) {
+                    table += `<th>${key}</th>`;
+                }
+                table += '</tr></thead><tbody>';
+
+                // Add table rows
+                data.forEach(function (item) {
+                    table += '<tr>';
+                    for (let key in item) {
+                        table += `<td>${item[key]}</td>`;
+                    }
+                    table += '</tr>';
+                });
+                table += '</tbody></table>';
+
+                return table;
             }
 
             // Get All Orders by Employee Name
@@ -155,8 +174,8 @@
                     }
                 });
             });
-
         });
     </script>
+
 </body>
 </html>

@@ -104,14 +104,22 @@
             <div class="response" id="allTerritoriesList"></div>
         </div>
 
-        <!-- Add New Territory -->
+        <!-- Add Territory -->
         <div class="endpoint">
-            <h2>Add New Territory</h2>
-            <input type="text" id="territoryName" placeholder="Enter Territory Name" required>
-            <textarea id="territoryDescription" placeholder="Enter Territory Description" rows="4"></textarea>
-            <button id="addTerritory">Add Territory</button>
+            <h2>Add Territory</h2>
+
+            <!-- Add Territory Form -->
+            <input type="text" id="territoryId" placeholder="Territory Id" required><br>
+            <input type="text" id="territoryDescription" placeholder="Territory Description" required><br>
+            <input type="number" id="regionId" placeholder="Region Id" required><br>
+
+            <button id="submitAddTerritory">Submit</button>
+
             <div class="response" id="addTerritoryResponse"></div>
         </div>
+
+
+
     </div>
     <script>
         $(document).ready(function () {
@@ -130,12 +138,36 @@
                 $(selector).hide();
             }
 
-            // Format response for display
             function formatResponse(data) {
                 if (!data || data.length === 0) {
                     return 'No results found.';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+
+                // If data is an array of objects, create a table
+                if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
+                    let table = '<table border="1" cellpadding="5" cellspacing="0">';
+                    // Create the header row
+                    table += '<thead><tr>';
+                    Object.keys(data[0]).forEach(key => {
+                        table += `<th>${key}</th>`;
+                    });
+                    table += '</tr></thead><tbody>';
+
+                    // Create rows for each data entry
+                    data.forEach(item => {
+                        table += '<tr>';
+                        Object.values(item).forEach(value => {
+                            table += `<td>${value}</td>`;
+                        });
+                        table += '</tr>';
+                    });
+
+                    table += '</tbody></table>';
+                    return table;
+                }
+
+                // Fallback: if the data is not an array of objects, just return it as JSON
+                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
             }
 
             // Get All Territories
@@ -160,35 +192,30 @@
                 });
             });
 
-            // Add New Territory
-            $('#addTerritory').click(function () {
+            // Add Territory
+            $('#submitAddTerritory').click(function (event) {
+                event.preventDefault();
                 clearResults();
-                const territoryName = $('#territoryName').val();
-                const territoryDescription = $('#territoryDescription').val();
+                showLoading('#addTerritoryResponse');
 
-                if (!territoryName) {
-                    $('#addTerritoryResponse').html('Please enter a territory name.').show();
-                    return;
-                }
-
-                const token = localStorage.getItem('token');
-                const territoryDto = {
-                    name: territoryName,
-                    description: territoryDescription
+                var territoryDto = {
+                    TerritoryId: $('#territoryId').val(),
+                    TerritoryDescription: $('#territoryDescription').val(),
+                    RegionId: $('#regionId').val()
                 };
 
-                showLoading('#addTerritoryResponse');
+                const token = localStorage.getItem('token');
                 $.ajax({
-                    url: `/api/territory`,
+                    url: '/api/territory', // API endpoint to add territory
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    contentType: 'application/json',
                     data: JSON.stringify(territoryDto),
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     success: function (data) {
                         hideLoading('#addTerritoryResponse');
-                        $('#addTerritoryResponse').html(formatResponse(data)).show();
+                        $('#addTerritoryResponse').html(formatResponse([data])).show(); // Display as table
                     },
                     error: function (err) {
                         hideLoading('#addTerritoryResponse');
@@ -196,7 +223,9 @@
                     }
                 });
             });
+
         });
     </script>
+
 </body>
 </html>

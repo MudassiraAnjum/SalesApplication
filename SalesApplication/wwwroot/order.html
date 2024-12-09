@@ -137,12 +137,27 @@
                 $(selector).html('<div class="loading">Loading ...</div>').show();
             }
 
-            // Format response for display
+            // Format response as a table for display
             function formatResponse(data) {
                 if (!data || data.length === 0) {
-                    return 'No results found.';
+                    return '<p>No results found.</p>';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+                let table = '<table border="1"><thead><tr>';
+                // Dynamically create the table headers
+                Object.keys(data[0]).forEach(key => {
+                    table += `<th>${key}</th>`;
+                });
+                table += '</tr></thead><tbody>';
+                // Populate the table with data
+                data.forEach(item => {
+                    table += '<tr>';
+                    Object.values(item).forEach(value => {
+                        table += `<td>${value}</td>`;
+                    });
+                    table += '</tr>';
+                });
+                table += '</tbody></table>';
+                return table;
             }
 
             // Get All Shipping Details
@@ -212,5 +227,6 @@
             });
         });
     </script>
+
 </body>
 </html>

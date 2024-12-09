@@ -122,15 +122,34 @@
                 $(selector).hide();
             }
 
-            // Format response for display
-            // Format response for display
+            // Format response for display as a table
             function formatResponse(data) {
                 if (!data || data.length === 0) {
                     return 'No results found.';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
-            }
 
+                let table = '<table border="1" cellpadding="5" cellspacing="0">';
+                // Add table header
+                table += '<thead><tr>';
+                Object.keys(data[0]).forEach(key => {
+                    table += `<th>${key}</th>`;
+                });
+                table += '</tr></thead>';
+
+                // Add table rows
+                table += '<tbody>';
+                data.forEach(item => {
+                    table += '<tr>';
+                    Object.values(item).forEach(value => {
+                        table += `<td>${value}</td>`;
+                    });
+                    table += '</tr>';
+                });
+                table += '</tbody>';
+                table += '</table>';
+
+                return table;
+            }
 
             // Get Bill Amount by Employee ID
             $('#getBillByEmployeeId').click(function () {
@@ -160,5 +179,6 @@
             });
         });
     </script>
+
 </body>
 </html>

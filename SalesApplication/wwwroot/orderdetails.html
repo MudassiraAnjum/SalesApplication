@@ -129,13 +129,32 @@
                 $(selector).hide();
             }
 
-            // Format response for display
-            // Format response for display
+            // Format response for display as a table
             function formatResponse(data) {
                 if (!data || data.length === 0) {
                     return 'No results found.';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+
+                // Create a table
+                let table = '<table border="1" cellpadding="5" cellspacing="0" style="width: 100%;"><thead><tr>';
+
+                // Add table headers dynamically from the keys of the first object in the data array
+                Object.keys(data[0]).forEach(key => {
+                    table += `<th>${key}</th>`;
+                });
+                table += '</tr></thead><tbody>';
+
+                // Add table rows dynamically from the data array
+                data.forEach(item => {
+                    table += '<tr>';
+                    Object.values(item).forEach(value => {
+                        table += `<td>${value}</td>`;
+                    });
+                    table += '</tr>';
+                });
+
+                table += '</tbody></table>';
+                return table;
             }
 
             // Get All Order Details
@@ -188,5 +207,6 @@
             });
         });
     </script>
+
 </body>
 </html>

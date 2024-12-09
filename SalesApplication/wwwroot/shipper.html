@@ -195,13 +195,38 @@
                 $(selector).hide();
             }
 
-            // Format response for display
             function formatResponse(data) {
                 if (!data || data.length === 0) {
                     return 'No results found.';
                 }
-                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
+
+                // If data is an array of objects, create a table
+                if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
+                    let table = '<table border="1" cellpadding="5" cellspacing="0">';
+                    // Create the header row
+                    table += '<thead><tr>';
+                    Object.keys(data[0]).forEach(key => {
+                        table += `<th>${key}</th>`;
+                    });
+                    table += '</tr></thead><tbody>';
+
+                    // Create rows for each data entry
+                    data.forEach(item => {
+                        table += '<tr>';
+                        Object.values(item).forEach(value => {
+                            table += `<td>${value}</td>`;
+                        });
+                        table += '</tr>';
+                    });
+
+                    table += '</tbody></table>';
+                    return table;
+                }
+
+                // Fallback: if the data is not an array of objects, just return it as JSON
+                return '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
             }
+
 
             // Create Shipper
             $('#createShipper').click(function () {
