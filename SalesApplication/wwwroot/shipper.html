@@ -97,14 +97,17 @@
     <div class="container scrollable">
         <h1>Shipper Management</h1>
 
-        <!-- Create New Shipper -->
+        <!-- Create Shipper -->
         <div class="endpoint">
-            <h2>Create New Shipper</h2>
-            <input type="text" id="shipperName" placeholder="Enter Shipper Name" required>
-            <input type="text" id="shipperPhone" placeholder="Enter Shipper Phone" required>
-            <button id="createShipper">Create Shipper</button>
-            <div class="response" id="createShipperResponse"></div>
+            <h2>Create Shipper</h2>
+            <input type="text" id="createCompanyName" placeholder="Enter Company Name" required>
+            <input type="text" id="createShipperPhone" placeholder="Enter Shipper Phone" required>
+            <input type="email" id="createShipperEmail" placeholder="Enter Shipper Email" required>
+            <input type="password" id="createShipperPassword" placeholder="Enter Shipper Password" required>
+            <button type="button" id="createShipper">Create Shipper</button>
+            <div class="response" id="createShipperResponse" style="display: none;"></div>
         </div>
+
 
         <!-- Get All Shippers -->
         <div class="endpoint">
@@ -117,11 +120,14 @@
         <div class="endpoint">
             <h2>Update Shipper</h2>
             <input type="number" id="updateShipperId" placeholder="Enter Shipper ID" required>
-            <input type="text" id="updateShipperName" placeholder="Enter New Shipper Name">
+            <input type="text" id="updateCompanyName" placeholder="Enter New Company Name">
             <input type="text" id="updateShipperPhone" placeholder="Enter New Shipper Phone">
-            <button id="updateShipper">Update Shipper</button>
-            <div class="response" id="updateShipperResponse"></div>
+            <input type="email" id="updateShipperEmail" placeholder="Enter New Shipper Email">
+            <input type="password" id="updateShipperPassword" placeholder="Enter New Shipper Password">
+            <button type="button" id="updateShipper">Update Shipper</button>
+            <div class="response" id="updateShipperResponse" style="display: none;"></div>
         </div>
+
 
         <!-- Search Shipper by Company Name -->
         <div class="endpoint">
@@ -134,21 +140,20 @@
         <!-- Get Total Amount Earned by Shipper on a Specific Date -->
         <div class="endpoint">
             <h2>Get Total Amount Earned by Shipper on a Specific Date</h2>
-            <input type="date" id="earningsDate" required>
+            <input type="date" id="earningsDate" required> <!-- Correct ID for the date input -->
             <button id="getTotalEarningsByDate">Get Earnings by Date</button>
-            <div class="response" id="totalEarningsResponse"></div>
+            <div class="response" id="shipperEarningsByDateResponse"></div> <!-- Correct response container for this API -->
         </div>
 
         <!-- Update Shipper (using JSON Patch) -->
-        <div class="endpoint">
-            <h2>Update Shipper (JSON Patch)</h2>
-            <input type="number" id="updateShipperIdPatch" placeholder="Enter Shipper ID" required>
-            <input type="text" id="updateShipperNamePatch" placeholder="Enter New Shipper Name">
-            <input type="text" id="updateShipperPhonePatch" placeholder="Enter New Shipper Phone">
-            <button id="updateShipperPatch">Update Shipper</button>
-            <div class="response" id="updateShipperResponsePatch"></div>
-        </div>
-
+        <!--<div class="endpoint">
+        <h2>Update Shipper (JSON Patch)</h2>
+        <input type="number" id="updateShipperIdPatch" placeholder="Enter Shipper ID" required>
+        <input type="text" id="updateShipperNamePatch" placeholder="Enter New Shipper Name">
+        <input type="text" id="updateShipperPhonePatch" placeholder="Enter New Shipper Phone">
+        <button id="updateShipperPatch">Update Shipper</button>
+        <div class="response" id="updateShipperResponsePatch"></div>
+    </div>-->
         <!-- Get Total Shipments by Shipper -->
         <div class="endpoint">
             <h2>Get Total Shipments by Shipper</h2>
@@ -160,16 +165,17 @@
         <div class="endpoint">
             <h2>Get Total Amount Earned by Shippers</h2>
             <button id="getTotalEarnings">Get Total Earnings</button>
-            <div class="response" id="totalEarningsResponse"></div>
+            <div class="response" id="totalEarningsResponse"></div> <!-- Correct response container for this API -->
         </div>
 
-        <!-- Get Total Amount Earned by Shipper in a Specific Year -->
+        <!-- Get Total Earnings by Shipper for a Specific Year -->
         <div class="endpoint">
-            <h2>Get Total Amount Earned by Shipper in a Specific Year</h2>
-            <input type="number" id="yearInput" placeholder="Enter Year" required>
+            <h2>Get Total Earnings by Shipper for a Specific Year</h2>
+            <input type="number" id="earningsYear" placeholder="Enter Year" required>
             <button id="getTotalEarningsByYear">Get Earnings by Year</button>
             <div class="response" id="totalEarningsByYearResponse"></div>
         </div>
+
     </div>
 
     <script>
@@ -197,18 +203,28 @@
                 return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
             }
 
-            // Create New Shipper
+            // Create Shipper
             $('#createShipper').click(function () {
                 clearResults();
+
                 const shipperDto = {
-                    name: $('#shipperName').val(),
-                    phone: $('#shipperPhone').val()
+                    companyName: $('#createCompanyName').val(),
+                    phone: $('#createShipperPhone').val(),
+                    email: $('#createShipperEmail').val(),
+                    password: $('#createShipperPassword').val()
                 };
+
+                // Validate company name (if necessary)
+                if (!/^[A-Z]/.test(shipperDto.companyName)) {
+                    $('#createShipperResponse').html("Error: Company name must start with a capital letter.").show();
+                    return;  // Prevent form submission if validation fails
+                }
 
                 const token = localStorage.getItem('token');
                 showLoading('#createShipperResponse');
+
                 $.ajax({
-                    url: `/api/shipper`,
+                    url: '/api/shipper',  // Adjust the URL if necessary
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -225,6 +241,7 @@
                     }
                 });
             });
+
 
             // Get All Shippers
             $('#getAllShippers').click(function () {
@@ -248,19 +265,22 @@
                 });
             });
 
+
             // Update Shipper
             $('#updateShipper').click(function () {
                 clearResults();
                 const shipperId = $('#updateShipperId').val();
                 const shipperDto = {
-                    name: $('#updateShipperName').val(),
-                    phone: $('#updateShipperPhone').val()
+                    companyName: $('#updateCompanyName').val(),  // Use companyName to match the backend DTO
+                    phone: $('#updateShipperPhone').val(),
+                    email: $('#updateShipperEmail').val(),
+                    password: $('#updateShipperPassword').val()
                 };
 
                 const token = localStorage.getItem('token');
                 showLoading('#updateShipperResponse');
                 $.ajax({
-                    url: `/api/shipper/${shipperId}`,
+                    url: `/api/shipper/${shipperId}`,  // Ensure this matches your backend API route
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -277,6 +297,7 @@
                     }
                 });
             });
+
 
             // Search Shipper by Company Name
             $('#searchShipper').click(function () {
@@ -302,28 +323,28 @@
             });
         //});
 
-        // Get Total Amount Earned by Shipper on a Specific Date
-        $('#getTotalAmountByDate').click(function () {
-            clearResults('#shipperEarningsByDateResponse');
-            const date = $('#shipperEarningsDate').val();
-            const token = localStorage.getItem('token');
-            showLoading('#shipperEarningsByDateResponse');
-            $.ajax({
-                url: `/api/shipper/totalamountearnedbyshipper/${date}`,
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function (data) {
-                    hideLoading('#shipperEarningsByDateResponse');
-                    $('#shipperEarningsByDateResponse').html(formatResponse(data)).show();
-                },
-                error: function (err) {
-                    hideLoading('#shipperEarningsByDateResponse');
-                    $('#shipperEarningsByDateResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
-                }
+            // Get Total Amount Earned by Shipper on a Specific Date
+            $('#getTotalEarningsByDate').click(function () {
+                clearResults('#shipperEarningsByDateResponse'); // Fix: Update the response ID
+                const date = $('#earningsDate').val(); // Fix: Get the correct date input value
+                const token = localStorage.getItem('token');
+                showLoading('#shipperEarningsByDateResponse'); // Fix: Show loading for the correct response container
+                $.ajax({
+                    url: `/api/shipper/totalamountearnedbyshipper/${date}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (data) {
+                        hideLoading('#shipperEarningsByDateResponse'); // Fix: Hide loading for the correct response container
+                        $('#shipperEarningsByDateResponse').html(formatResponse(data)).show(); // Fix: Update the correct response container
+                    },
+                    error: function (err) {
+                        hideLoading('#shipperEarningsByDateResponse'); // Fix: Hide loading for the correct response container
+                        $('#shipperEarningsByDateResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show(); // Fix: Update the correct response container
+                    }
+                });
             });
-        });
 
         // Update Shipper Details
         $('#updateShipperDetails').click(function () {
@@ -376,50 +397,59 @@
             });
         });
 
-        // Get Total Amount Earned by All Shippers
-        $('#getTotalEarnings').click(function () {
-            clearResults('#totalEarningsResponse');
-            const token = localStorage.getItem('token');
-            showLoading('#totalEarningsResponse');
-            $.ajax({
-                url: `/api/shipper/total-earnings`,
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function (data) {
-                    hideLoading('#totalEarningsResponse');
-                    $('#totalEarningsResponse').html(formatResponse(data)).show();
-                },
-                error: function (err) {
-                    hideLoading('#totalEarningsResponse');
-                    $('#totalEarningsResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
-                }
+            // Get Total Amount Earned by All Shippers
+            $('#getTotalEarnings').click(function () {
+                clearResults('#totalEarningsResponse');
+                const token = localStorage.getItem('token');
+                showLoading('#totalEarningsResponse');
+                $.ajax({
+                    url: `/api/shipper/total-earnings`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (data) {
+                        hideLoading('#totalEarningsResponse');
+                        $('#totalEarningsResponse').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#totalEarningsResponse');
+                        $('#totalEarningsResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
             });
-        });
 
-        // Get Total Earnings by Shipper for a Specific Year
-        $('#getTotalEarningsByYear').click(function () {
-            clearResults('#totalEarningsByYearResponse');
-            const year = $('#earningsYear').val();
-            const token = localStorage.getItem('token');
-            showLoading('#totalEarningsByYearResponse');
-            $.ajax({
-                url: `/api/shipper/totalamountearnedbyshipper/${year}`,
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function (data) {
-                    hideLoading('#totalEarningsByYearResponse');
-                    $('#totalEarningsByYearResponse').html(formatResponse(data)).show();
-                },
-                error: function (err) {
-                    hideLoading('#totalEarningsByYearResponse');
-                    $('#totalEarningsByYearResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+            // Get Total Earnings by Shipper for a Specific Year
+            $('#getTotalEarningsByYear').click(function () {
+                clearResults('#totalEarningsByYearResponse');
+
+                const year = $('#earningsYear').val(); // Get the year from the input field
+                if (!year) {
+                    // If year is empty, show an error message and stop the request
+                    $('#totalEarningsByYearResponse').html('Please select a valid year.').show();
+                    return;
                 }
+
+                const token = localStorage.getItem('token');
+                showLoading('#totalEarningsByYearResponse');
+
+                $.ajax({
+                    url: `/api/shipper/totalamountearnedbyshipper/${year}`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (data) {
+                        hideLoading('#totalEarningsByYearResponse');
+                        $('#totalEarningsByYearResponse').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#totalEarningsByYearResponse');
+                        $('#totalEarningsByYearResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
             });
-        });
+
     });
     </script>
 </body>

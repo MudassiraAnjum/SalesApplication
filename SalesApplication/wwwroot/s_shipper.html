@@ -104,7 +104,7 @@
             <div class="response" id="allShippersList"></div>
         </div>
 
-       <!-- Update Shipper -->
+        <!-- Update Shipper -->
         <div class="endpoint">
             <h2>Update Shipper</h2>
             <input type="number" id="updateShipperId" placeholder="Enter Shipper ID" required>
@@ -112,12 +112,12 @@
             <input type="text" id="updateShipperPhone" placeholder="Enter New Shipper Phone">
             <input type="email" id="updateShipperEmail" placeholder="Enter New Shipper Email">
             <input type="password" id="updateShipperPassword" placeholder="Enter New Shipper Password">
-            <button id="updateShipper">Update Shipper</button>
-            <div class="response" id="updateShipperResponse"></div>
+            <button type="button" id="updateShipper">Update Shipper</button>
+            <div class="response" id="updateShipperResponse" style="display: none;"></div>
         </div>
 
         <!-- Update Shipper Details (JSON Patch) -->
-        <div class="endpoint">
+        <!--<div class="endpoint">
             <h2>Update Shipper Details (JSON Patch)</h2>
             <input type="number" id="shipperIdToUpdate" placeholder="Enter Shipper ID" required>
             <input type="text" id="updateShipperNamePatch" placeholder="Enter New Shipper Name">
@@ -125,107 +125,108 @@
             <button id="updateShipperDetails">Update Shipper Details</button>
             <div class="response" id="updateShipperResponsePatch"></div>
         </div>
-    </div>
+    </div>-->
 
-    <script>
-        // Get All Shippers
-        $('#getAllShippers').click(function () {
-            clearResults();
-            showLoading('#allShippersList');
-            const token = localStorage.getItem('token');
-            $.ajax({
-                url: `/api/shipper`,
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                success: function (data) {
-                    hideLoading('#allShippersList');
-                    $('#allShippersList').html(formatResponse(data)).show();
-                },
-                error: function (err) {
-                    hideLoading('#allShippersList');
-                    $('#allShippersList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
-                }
+        <script>
+            // Get All Shippers
+            $('#getAllShippers').click(function () {
+                clearResults();
+                showLoading('#allShippersList');
+                const token = localStorage.getItem('token');
+                $.ajax({
+                    url: `/api/shipper`,
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function (data) {
+                        hideLoading('#allShippersList');
+                        $('#allShippersList').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#allShippersList');
+                        $('#allShippersList').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
             });
-        });
 
-        // Update Shipper
-        $('#updateShipper').click(function () {
-            clearResults();
-            const shipperId = $('#updateShipperId').val();
-            const shipperDto = {
-                name: $('#updateCompanyName').val(),
-                phone: $('#updateShipperPhone').val(),
-                email: $('#updateShipperEmail').val(),
-                password: $('#updateShipperPassword').val()
-            };
+            // Update Shipper
+            $('#updateShipper').click(function () {
+                clearResults();
+                const shipperId = $('#updateShipperId').val();
+                const shipperDto = {
+                    companyName: $('#updateCompanyName').val(),  // Use companyName to match the backend DTO
+                    phone: $('#updateShipperPhone').val(),
+                    email: $('#updateShipperEmail').val(),
+                    password: $('#updateShipperPassword').val()
+                };
 
-            const token = localStorage.getItem('token');
-            showLoading('#updateShipperResponse');
-            $.ajax({
-                url: `/api/shipper/${shipperId}`,
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify(shipperDto),
-                success: function (data) {
-                    hideLoading('#updateShipperResponse');
-                    $('#updateShipperResponse').html(formatResponse(data)).show();
-                },
-                error: function (err) {
-                    hideLoading('#updateShipperResponse');
-                    $('#updateShipperResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
-                }
+                const token = localStorage.getItem('token');
+                showLoading('#updateShipperResponse');
+                $.ajax({
+                    url: `/api/shipper/${shipperId}`,  // Ensure this matches your backend API route
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(shipperDto),
+                    success: function (data) {
+                        hideLoading('#updateShipperResponse');
+                        $('#updateShipperResponse').html(formatResponse(data)).show();
+                    },
+                    error: function (err) {
+                        hideLoading('#updateShipperResponse');
+                        $('#updateShipperResponse').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
             });
-        });
 
-        // Update Shipper Details (JSON Patch)
-        $('#updateShipperDetails').click(function () {
-            clearResults('#updateShipperResponsePatch');
-            const shipperId = $('#shipperIdToUpdate').val();
-            const patchData = [
-                { "op": "replace", "path": "/name", "value": $('#updateShipperNamePatch').val() },
-                { "op": "replace", "path": "/phone", "value": $('#updateShipperPhonePatch').val() }
-            ];
-            const token = localStorage.getItem('token');
-            showLoading('#updateShipperResponsePatch');
-            $.ajax({
-                url: `/api/shipper/edit/${shipperId}`,
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json-patch+json'
-                },
-                data: JSON.stringify(patchData),
-                success: function () {
-                    hideLoading('#updateShipperResponsePatch');
-                    $('#updateShipperResponsePatch').html('Shipper updated successfully.').show();
-                },
-                error: function (err) {
-                    hideLoading('#updateShipperResponsePatch');
-                    $('#updateShipperResponsePatch').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
-                }
+
+            // Update Shipper Details (JSON Patch)
+            $('#updateShipperDetails').click(function () {
+                clearResults('#updateShipperResponsePatch');
+                const shipperId = $('#shipperIdToUpdate').val();
+                const patchData = [
+                    { "op": "replace", "path": "/name", "value": $('#updateShipperNamePatch').val() },
+                    { "op": "replace", "path": "/phone", "value": $('#updateShipperPhonePatch').val() }
+                ];
+                const token = localStorage.getItem('token');
+                showLoading('#updateShipperResponsePatch');
+                $.ajax({
+                    url: `/api/shipper/edit/${shipperId}`,
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json-patch+json'
+                    },
+                    data: JSON.stringify(patchData),
+                    success: function () {
+                        hideLoading('#updateShipperResponsePatch');
+                        $('#updateShipperResponsePatch').html('Shipper updated successfully.').show();
+                    },
+                    error: function (err) {
+                        hideLoading('#updateShipperResponsePatch');
+                        $('#updateShipperResponsePatch').html('Error: ' + (err.responseJSON?.Message || err.responseText)).show();
+                    }
+                });
             });
-        });
 
-        function clearResults() {
-            $('.response').html('').hide();
-        }
+            function clearResults() {
+                $('.response').html('').hide();
+            }
 
-        function showLoading(selector) {
-            $(selector).html('<div class="loading">Loading...</div>').show();
-        }
+            function showLoading(selector) {
+                $(selector).html('<div class="loading">Loading...</div>').show();
+            }
 
-        function hideLoading(selector) {
-            $(selector).find('.loading').remove();
-        }
+            function hideLoading(selector) {
+                $(selector).find('.loading').remove();
+            }
 
-        function formatResponse(data) {
-            return JSON.stringify(data, null, 2);
-        }
-    </script>
+            function formatResponse(data) {
+                return JSON.stringify(data, null, 2);
+            }
+        </script>
 </body>
 </html>
