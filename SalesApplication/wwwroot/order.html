@@ -102,11 +102,11 @@
         <h1>Order Management</h1>
 
         <!-- Get All Orders -->
-        <div class="endpoint">
+        <!--<div class="endpoint">
             <h2>Get All Orders</h2>
             <button id="getAllOrders">Get All Orders</button>
             <div class="response" id="allOrdersList"></div>
-        </div>
+        </div>-->
 
 
         <!-- Get All Shipping Details -->
@@ -157,7 +157,29 @@
                 }
                 return '<pre>' + JSON.stringify(data, null, 2) + '</pre>'; // Pretty print JSON
             }
+            function getAllOrders() {
+                const button = $('#fetchOrdersBtn');
+                button.prop('disabled', true); // Disable button during API call
+                $('#ordersOutput').html('<div class="loading">Loading...</div>');
 
+                $.ajax({
+                    url: 'api/order', // Endpoint to get all orders
+                    method: 'GET',
+                    headers: {
+                        'Authorization': Bearer ${ localStorage.getItem('token') }  // Use the token in the Authorization header
+        },
+            success: (response) => {
+                $('#ordersOutput').html(<pre>${JSON.stringify(response, null, 2)}</pre>);
+            },
+                error: (xhr) => {
+                    const errorMessage = xhr.responseJSON?.message || 'Error fetching orders';
+                    $('#ordersOutput').html(<p style="color: red;">${errorMessage}</p>);
+                },
+                    complete: () => {
+                        button.prop('disabled', false); // Re-enable button
+                    }
+        });
+}
             // Get All Shipping Details
             $('#getAllShippingDetails').click(function () {
                 clearResults();
