@@ -1,359 +1,5 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management System</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #74ebd5, #acb6e5);
-            color: #333;
-        }
-
-        .container {
-            width: 60%;
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        /* Header Styles */
-        header {
-            text-align: center;
-            padding: 20px 0;
-            background: #4a90e2;
-            color: white;
-            border-radius: 15px 15px 0 0;
-        }
-
-            header h1 {
-                font-size: 2.5rem;
-                margin: 0;
-            }
-
-            header p {
-                font-size: 1rem;
-                margin-top: 10px;
-            }
-
-        /* Section Styles */
-        section {
-            margin-bottom: 40px;
-        }
-
-            section h2 {
-                font-size: 1.8rem;
-                color: #4a90e2;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            padding: 12px 20px;
-            background: #4a90e2;
-            color: white;
-            font-size: 1rem;
-            text-align: center;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-            margin: 10px auto;
-            display: block;
-            max-width: 200px;
-        }
-
-            .btn:hover {
-                background: #357ABD;
-                transform: translateY(-2px);
-            }
-
-            .btn:active {
-                transform: translateY(0);
-            }
-
-        /* Input Group */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-            .input-group input {
-                padding: 10px;
-                border: 2px solid #ccc;
-                border-radius: 6px;
-                font-size: 1rem;
-                width: 45%;
-            }
-
-                .input-group input:focus {
-                    border-color: #4a90e2;
-                    outline: none;
-                }
-
-        /* Response Container */
-        .response-container {
-            padding: 15px;
-            background: #f4f6f8;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-            .response-container pre {
-                font-family: 'Courier New', monospace;
-                font-size: 0.9rem;
-                color: #333;
-            }
-
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #4a90e2;
-            color: white;
-            border-radius: 0 0 15px 15px;
-        }
-
-            footer a {
-                color: #ffeaa7;
-                text-decoration: none;
-            }
-
-                footer a:hover {
-                    text-decoration: underline;
-                }
-
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-
-                .input-group input {
-                    width: 100%;
-                }
-
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <header>
-            <h1>Order Management</h1>
-            <p>Effortlessly manage and track your orders.</p>
-        </header>
-
-        <!-- Get All Orders -->
-        <section>
-            <h2>Get All Orders</h2>
-            <button id="getAllOrdersButton" class="btn">Fetch All Orders</button>
-            <div id="ordersList" class="response-container"></div>
-        </section>
-
-        <!-- Get Orders Between Dates -->
-        <section>
-            <h2>Get Orders Between Dates</h2>
-            <div class="input-group">
-                <input type="date" id="fromDate" />
-                <input type="date" id="toDate" />
-            </div>
-            <button id="getOrdersBetweenDatesButton" class="btn">Fetch Orders</button>
-            <div id="ordersByDate" class="response-container"></div>
-        </section>
-
-        <!-- Get Orders By Employee -->
-        <section>
-            <h2>Get Orders By Employee</h2>
-            <button id="getOrdersByEmployeeButton" class="btn">Fetch Employee Orders</button>
-            <div id="ordersByEmployee" class="response-container"></div>
-        </section>
-    </div>
-
-    <script>
-        $(document).ready(function () {
-            // Check if the user is logged in and has the required role
-            function checkAuthorization() {
-                const token = localStorage.getItem('authToken');
-                const role = localStorage.getItem('role');
-
-                if (!token || (role !== 'Admin' && role !== 'Employee')) {
-                    alert('Access denied. You need to be an Admin or Employee to access this page.');
-                    window.location.href = '/login.html'; // Redirect to login page
-                    return false;
-                }
-                return true;
-            }
-
-            // Fetch All Orders
-            $('#getAllOrdersButton').click(function () {
-                if (!checkAuthorization()) return;
-
-                const token = localStorage.getItem('authToken');
-                $.ajax({
-                    url: '/api/orders/allshipdetails',
-                    method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: function (data) {
-                        formatResponse('#ordersList', data);
-                    },
-                    error: function () {
-                        showError('#ordersList', 'Failed to fetch orders. Try again.');
-                    }
-                });
-            });
-
-            // Fetch Orders Between Dates
-            $('#getOrdersBetweenDatesButton').click(function () {
-                if (!checkAuthorization()) return;
-
-                const fromDate = $('#fromDate').val();
-                const toDate = $('#toDate').val();
-                const token = localStorage.getItem('authToken');
-
-                $.ajax({
-                    url: `/api/orders/BetweenDate/${fromDate}/${toDate}`,
-                    method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: function (data) {
-                        formatResponse('#ordersByDate', data);
-                    },
-                    error: function () {
-                        showError('#ordersByDate', 'Failed to fetch orders for the selected dates.');
-                    }
-                });
-            });
-
-            // Fetch Orders By Employee
-            $('#getOrdersByEmployeeButton').click(function () {
-                if (!checkAuthorization()) return;
-
-                const token = localStorage.getItem('authToken');
-                $.ajax({
-                    url: '/api/orders/numberoforderbyeachemployee',
-                    method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: function (data) {
-                        formatResponse('#ordersByEmployee', data);
-                    },
-                    error: function () {
-                        showError('#ordersByEmployee', 'Failed to fetch employee order data.');
-                    }
-                });
-            });
-
-            // Display JSON Response
-            function formatResponse(selector, data) {
-                $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
-            }
-
-            // Display Error Messages
-            function showError(selector, message) {
-                $(selector).html(`<div class="error">${message}</div>`);
-            }
-        });
-
-        //$(document).ready(function () {
-        //    // Display Error Messages
-        //    function showError(selector, message) {
-        //        $(selector).html(`<div class="error">${message}</div>`);
-        //    }
-
-        //    // Display JSON Response
-        //    function formatResponse(selector, data) {
-        //        $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
-        //    }
-
-        //    // Fetch All Orders
-        //    $('#getAllOrdersButton').click(function () {
-        //        const token = localStorage.getItem('authToken');
-        //        if (!token) {
-        //            showError('#ordersList', 'Please log in to access data.');
-        //            return;
-        //        }
-
-        //        $.ajax({
-        //            url: '/api/orders/allshipdetails',
-        //            method: 'GET',
-        //            headers: { 'Authorization': 'Bearer ' + token },
-        //            success: (data) => formatResponse('#ordersList', data),
-        //            error: (err) => showError('#ordersList', 'Failed to fetch orders. Try again.')
-        //        });
-        //    });
-
-        //    // Fetch Orders Between Dates
-        //    $('#getOrdersBetweenDatesButton').click(function () {
-        //        const fromDate = $('#fromDate').val();
-        //        const toDate = $('#toDate').val();
-        //        const token = localStorage.getItem('authToken');
-
-        //        if (!fromDate || !toDate) {
-        //            showError('#ordersByDate', 'Please select both dates.');
-        //            return;
-        //        }
-
-        //        $.ajax({
-        //            url: `/api/orders/BetweenDate/${fromDate}/${toDate}`,
-        //            method: 'GET',
-        //            headers: { 'Authorization': 'Bearer ' + token },
-        //            success: (data) => formatResponse('#ordersByDate', data),
-        //            error: (err) => showError('#ordersByDate', 'Failed to fetch orders for the selected dates.')
-        //        });
-        //    });
-
-        //    // Fetch Orders By Employee
-        //    $('#getOrdersByEmployeeButton').click(function () {
-        //        const token = localStorage.getItem('authToken');
-        //        if (!token) {
-        //            showError('#ordersByEmployee', 'Please log in to access data.');
-        //            return;
-        //        }
-
-        //        $.ajax({
-        //            url: '/api/orders/numberoforderbyeachemployee',
-        //            method: 'GET',
-        //            headers: { 'Authorization': 'Bearer ' + token },
-        //            success: (data) => formatResponse('#ordersByEmployee', data),
-        //            error: (err) => showError('#ordersByEmployee', 'Failed to fetch employee order data.')
-        //        });
-        //    });
-        
-    </script>
-</body>
-
-</html>
-
-
-<!--<!DOCTYPE html>
-<html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -361,227 +7,248 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom, #fffbf7, #ffe6e6);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom right, #1e3c72, #2a5298);
             margin: 0;
             padding: 0;
-            color: #2c3e50;
+            color: #fff;
         }
 
         .container {
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             margin: 40px auto;
-            padding: 20px;
             background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            padding: 20px;
+            color: #333;
         }
 
         h1 {
-            font-size: 2.5rem;
             text-align: center;
-            color: #e74c3c;
-            margin-bottom: 20px;
+            color: #1e3c72;
         }
 
-        h2 {
-            font-size: 1.5rem;
-            color: #e67e22;
-            margin-bottom: 15px;
+        .section {
+            margin-top: 30px;
+        }
+
+            .section h2 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+                color: #1e3c72;
+            }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         button {
-            background: #3498db;
-            color: #ffffff;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 12px 25px;
             font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background 0.3s;
         }
 
             button:hover {
-                background: #2980b9;
-                transform: translateY(-2px);
+                transform: translateY(-3px);
+                background: linear-gradient(90deg, #1a2b5c, #204d74);
+            }
+
+            button:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             }
 
         .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
             .input-group input {
-                padding: 10px;
+                padding: 12px;
                 font-size: 1rem;
-                border: 2px solid #bdc3c7;
+                border: 2px solid #2a5298;
                 border-radius: 5px;
                 flex: 1;
+                outline: none;
             }
+
+                .input-group input:focus {
+                    border-color: #1e3c72;
+                    box-shadow: 0 0 8px rgba(30, 60, 114, 0.5);
+                }
 
         .response-container {
             margin-top: 20px;
             padding: 15px;
-            background: #f8f9fa;
-            border: 1px solid #ecf0f1;
-            border-radius: 10px;
+            background: #f4f6f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            color: #333;
             max-height: 300px;
             overflow-y: auto;
         }
 
-        pre {
-            font-family: 'Courier New', monospace;
-            background: #ecf0f1;
-            padding: 10px;
-            border-radius: 8px;
-            white-space: pre-wrap;
-        }
-
         .error {
-            color: #c0392b;
+            color: #d9534f;
             font-weight: bold;
             margin-top: 10px;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #7f8c8d;
+        .response-pre {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
         }
 
-            footer a {
-                color: #3498db;
-                text-decoration: none;
-            }
-
-                footer a:hover {
-                    text-decoration: underline;
-                }
-
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.2rem;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #ccc;
         }
     </style>
 </head>
-
 <body>
     <div class="container">
-        <h1>Order Management</h1>-->
-<!-- Section: Get All Orders -->
-<!--<section>
-    <h2>Get All Orders</h2>
-    <button id="getAllOrdersButton">Fetch All Orders</button>
-    <div id="ordersList" class="response-container"></div>
-</section>-->
-<!-- Section: Orders Between Dates -->
-<!--<section>
-    <h2>Get Orders Between Dates</h2>
-    <div class="input-group">
-        <input type="date" id="fromDate" />
-        <input type="date" id="toDate" />
-    </div>
-    <button id="getOrdersBetweenDatesButton">Fetch Orders</button>
-    <div id="ordersByDate" class="response-container"></div>
-</section>-->
-<!-- Section: Orders By Employee -->
-<!--<section>
-            <h2>Get Orders By Employee</h2>
-            <button id="getOrdersByEmployeeButton">Fetch Employee Orders</button>
+        <h1>Order Management</h1>
+        <!-- Protected API Requests -->
+        <div class="section" id="protectedApi">
+            <h2>Get All Orders</h2>
+            <div class="button-group">
+                <button id="getAllOrdersButton">Get All Orders</button>
+            </div>
+            <div id="ordersList" class="response-container"></div>
+
+            <h2>Get Orders Between Dates</h2>
+            <div class="input-group">
+                <input type="date" id="fromDate" placeholder="From Date" />
+                <input type="date" id="toDate" placeholder="To Date" />
+            </div>
+            <div class="button-group">
+                <button id="getOrdersBetweenDatesButton">Get Orders Between Dates</button>
+            </div>
+            <div id="ordersByDate" class="response-container"></div>
+
+            <h2>Get Number of Orders By Each Employee</h2>
+            <div class="button-group">
+                <button id="getOrdersByEmployeeButton">Get Orders By Employee</button>
+            </div>
             <div id="ordersByEmployee" class="response-container"></div>
-        </section>
+        </div>
     </div>
 
-    <footer>
-        © 2024 Order Management | <a href="#">Privacy Policy</a>
-    </footer>
+    <footer>© 2024 Order Management System</footer>
 
     <script>
         $(document).ready(function () {
-            // Utility functions
+            // Show error message
             function showError(selector, message) {
-                $(selector).html(`<div class="error">${message}</div>`);
+                $(selector).html(`<div class="error">${message}</div>`).fadeIn();
             }
 
+            // Display formatted response
             function formatResponse(selector, data) {
-                $(selector).html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+                $(selector).html('<pre class="response-pre">' + JSON.stringify(data, null, 2) + '</pre>').fadeIn();
             }
 
+            // Get JWT token from localStorage
             function getAuthToken() {
-                return localStorage.getItem('authToken');
+                return localStorage.getItem('authToken'); // Retrieve JWT from localStorage
             }
 
-            // Fetch All Orders
+            // Get All Orders
             $('#getAllOrdersButton').click(function () {
                 const token = getAuthToken();
                 if (!token) {
-                    showError('#ordersList', 'Please log in to access orders.');
+                    showError('#ordersList', 'Please log in first.');
                     return;
                 }
 
                 $.ajax({
                     url: '/api/orders/allshipdetails',
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: (data) => formatResponse('#ordersList', data),
-                    error: (err) => showError('#ordersList', err.responseJSON?.Message || 'Unable to fetch orders.')
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (data) {
+                        formatResponse('#ordersList', data);
+                    },
+                    error: function (err) {
+                        showError('#ordersList', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
                 });
             });
 
-            // Fetch Orders Between Dates
+            // Get Orders Between Dates
             $('#getOrdersBetweenDatesButton').click(function () {
                 const fromDate = $('#fromDate').val();
                 const toDate = $('#toDate').val();
                 const token = getAuthToken();
 
+                if (!token) {
+                    showError('#ordersByDate', 'Please log in first.');
+                    return;
+                }
+
                 if (!fromDate || !toDate) {
-                    showError('#ordersByDate', 'Please select valid dates.');
+                    showError('#ordersByDate', 'Please select both dates.');
                     return;
                 }
 
                 $.ajax({
                     url: `/api/orders/BetweenDate/${fromDate}/${toDate}`,
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: (data) => formatResponse('#ordersByDate', data),
-                    error: (err) => showError('#ordersByDate', err.responseJSON?.Message || 'Unable to fetch data.')
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (data) {
+                        formatResponse('#ordersByDate', data);
+                    },
+                    error: function (err) {
+                        showError('#ordersByDate', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
                 });
             });
 
-            // Fetch Orders By Employee
+            // Get Number of Orders By Each Employee
             $('#getOrdersByEmployeeButton').click(function () {
                 const token = getAuthToken();
                 if (!token) {
-                    showError('#ordersByEmployee', 'Please log in to access employee orders.');
+                    showError('#ordersByEmployee', 'Please log in first.');
                     return;
                 }
 
                 $.ajax({
                     url: '/api/orders/numberoforderbyeachemployee',
                     method: 'GET',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    success: (data) => formatResponse('#ordersByEmployee', data),
-                    error: (err) => showError('#ordersByEmployee', err.responseJSON?.Message || 'Unable to fetch data.')
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function (data) {
+                        formatResponse('#ordersByEmployee', data);
+                    },
+                    error: function (err) {
+                        showError('#ordersByEmployee', 'Error: ' + (err.responseJSON?.Message || err.responseText));
+                    }
                 });
             });
         });
     </script>
 </body>
+</html>
 
-</html>-->
+

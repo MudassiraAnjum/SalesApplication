@@ -51,11 +51,5 @@ public class EmployeeService : IEmployeeService
     }
 }
 
-        //catch (KeyNotFoundException ex)
-        //{
-        //    throw new Exception($"Employee with ID {employeeId} not found. {ex.Message}");
-        //}
-        //catch (Exception ex)
-        //{
-        //    throw new Exception($"An error occurred while retrieving sales data: {ex.Message}");
+        
  

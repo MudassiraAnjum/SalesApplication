@@ -4,6 +4,237 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            background: #ff7e5f;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            button:hover {
+                background: #feb47b;
+            }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 10px;
+            color: #555;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .success-message {
+            color: #2ecc71;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome To SalesPro Hub</h1>
+
+        <!-- Registration Section -->
+        <div id="registerSection">
+            <form id="registerForm">
+                <h2>Register</h2>
+                <input type="text" id="registerCompany" placeholder="Company Name" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            <div id="registerError" class="error-message"></div>
+            <div id="registerSuccess" class="success-message"></div>
+            <div class="toggle-link" id="toLogin">Already have an account? Login</div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="loginSection" style="display: none;">
+            <form id="loginForm">
+                <h2>Login</h2>
+                <input type="text" id="loginUsername" placeholder="Email or Username" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <div id="loginError" class="error-message"></div>
+            <div class="toggle-link" id="toRegister">Don't have an account? Register</div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Toggle between Register and Login sections
+            $('#toLogin').click(function () {
+                $('#registerSection').hide();
+                $('#loginSection').fadeIn();
+            });
+            $('#toRegister').click(function () {
+                $('#loginSection').hide();
+                $('#registerSection').fadeIn();
+            });
+
+            // Handle Registration
+            $('#registerForm').submit(function (event) {
+                event.preventDefault();
+                const registrationData = {
+                    companyName: $('#registerCompany').val(),
+                    email: $('#registerEmail').val(),
+                    password: $('#registerPassword').val()
+                };
+
+                $('#registerError').text('');
+                $('#registerSuccess').text('');
+
+                $.ajax({
+                    url: '/api/auth/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(registrationData),
+                    success: function () {
+                        $('#registerSuccess').text('Registration successful! Please log in.');
+                        setTimeout(() => {
+                            $('#registerSection').hide();
+                            $('#loginSection').fadeIn();
+                        }, 2000);
+                    },
+                    error: function (err) {
+                        $('#registerError').text('Registration failed: ' + (err.responseJSON?.Message || 'Error occurred.'));
+                    }
+                });
+            });
+
+            // Handle Login
+            $('#loginForm').submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const username = $('#loginUsername').val();
+                const password = $('#loginPassword').val();
+
+                $('#loginError').text(''); // Clear previous errors
+
+                $.ajax({
+                    url: '/api/auth/login', // Replace with your API endpoint
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ username, password }),
+                    success: function (response) {
+                        const { token, role } = response;
+                        localStorage.setItem('authToken', token);
+                        localStorage.setItem('userRole', role);
+
+                        // Redirect user based on their role
+                        switch (role) {
+                            case 'Admin':
+                                window.location.href = '/index0.html';
+                                break;
+                            case 'Employee':
+                                window.location.href = '/index2.html';
+                                break;
+                            case 'Shipper':
+                                window.location.href = '/index3.html';
+                                break;
+                            default:
+                                alert('Invalid role.');
+                                break;
+                        }
+                    },
+                    error: function (err) {
+                        const errorMessage = err.responseJSON?.message || 'Invalid username or password.';
+                        $('#loginError').text('Login failed: ' + errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
@@ -99,34 +330,34 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome To SalesPro Hub</h1>
 
-        <!-- Registration Section -->
-        <div id="registerSection">
-            <form id="registerForm">
-                <h2>Register</h2>
-                <input type="text" id="registerCompany" placeholder="Company Name" required>
-                <input type="email" id="registerEmail" placeholder="Email" required>
-                <input type="password" id="registerPassword" placeholder="Password" required>
-                <button type="submit">Register</button>
-            </form>
-            <div id="registerError" class="error-message"></div>
-            <div id="registerSuccess" class="success-message"></div>
-            <div class="toggle-link" id="toLogin">Already have an account? Login</div>
-        </div>
-
-        <!-- Login Section -->
-        <div id="loginSection" style="display: none;">
-            <form id="loginForm">
-                <h2>Login</h2>
-                <input type="text" id="loginUsername" placeholder="Email or Username" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
-                <button type="submit">Login</button>
-            </form>
-            <div id="loginError" class="error-message"></div>
-            <div class="toggle-link" id="toRegister">Don't have an account? Register</div>
-        </div>
+        <h1>Welcome To SalesPro Hub</h1>-->
+<!-- Registration Section -->
+<!--<div id="registerSection">
+    <form id="registerForm">
+        <h2>Register</h2>
+        <input type="text" id="registerCompany" placeholder="Company Name" required>
+        <input type="email" id="registerEmail" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
+    <div id="registerError" class="error-message"></div>
+    <div id="registerSuccess" class="success-message"></div>
+    <div class="toggle-link" id="toLogin">Already have an account? Login</div>
+</div>-->
+<!-- Login Section -->
+<!--<div id="loginSection" style="display: none;">
+        <form id="loginForm">
+            <h2>Login</h2>
+            <input type="text" id="loginUsername" placeholder="Email or Username" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div id="loginError" class="error-message"></div>
+        <div class="toggle-link" id="toRegister">Don't have an account? Register</div>
     </div>
+
+
 
     <script>
         $(document).ready(function () {
@@ -170,47 +401,85 @@
                 });
             });
 
-            
-            $('#loginForm').submit(function (event) {
-                event.preventDefault();
-                const loginData = {
-                    username: $('#loginUsername').val(),
-                    password: $('#loginPassword').val()
-                };
+            // Add event listener to the login form
+            document.getElementById("login-form")?.addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent the default form submission behavior
 
-                $('#loginError').text('');
+                // Retrieve the username and password from the input fields
+                const username = document.getElementById("login-username").value;
+                const password = document.getElementById("login-password").value;
 
+                // Make an AJAX POST request
                 $.ajax({
-                    url: '/api/auth/login',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(loginData),
+                    url: `'/api/auth/login`, // API endpoint for login
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ username, password }), // Send the data as a JSON object
                     success: function (response) {
-                        localStorage.setItem('authToken', response.token);
-                        alert('Login successful! Redirecting...');
-                        window.location.href = '/index.html'; // Redirect to home or dashboard
+                        // Extract token and role from the response
+                        const { token, role } = response;
+
+                        // Store the authentication token and user role in localStorage
+                        localStorage.setItem("authToken", token);
+                        localStorage.setItem("userRole", role);
+
+                        // Redirect user based on their role
+                        switch (role) {
+                            case "Admin":
+                                window.location.href = "/index0.html"; // Admin page
+                                break;
+                            case "Employee":
+                                window.location.href = "/index2.html"; // Employee page
+                                break;
+                            case "Shipper":
+                                window.location.href = "/index3.html"; // Shipper page
+                                break;
+                            default:
+                                alert("Invalid role."); // Handle unknown roles
+                                break;
+                        }
                     },
                     error: function (err) {
-                        $('#loginError').text('Login failed: ' + (err.responseJSON?.title || 'Invalid credentials.'));
+                        // Handle errors (e.g., 401 or other statuses)
+                        if (err.status === 401) {
+                            document.getElementById("login-response").textContent = "Invalid username or password.";
+                        } else {
+                            const errorMessage = err.responseJSON?.message || "An unexpected error occurred.";
+                            document.getElementById("login-response").textContent = `Error: ${errorMessage}`;
+                        }
                     }
                 });
             });
+
+
+
+            //$('#loginForm').submit(function (event) {
+            //    event.preventDefault();
+            //    const loginData = {
+            //        username: $('#loginUsername').val(),
+            //        password: $('#loginPassword').val()
+            //    };
+
+            //    $('#loginError').text('');
+
+            //    $.ajax({
+            //        url: '/api/auth/login',
+            //        method: 'POST',
+            //        contentType: 'application/json',
+            //        data: JSON.stringify(loginData),
+            //        success: function (response) {
+            //            localStorage.setItem('authToken', response.token);
+            //            alert('Login successful! Redirecting...');
+            //            window.location.href = '/index.html'; // Redirect to home or dashboard
+
+            //        //    window.location.href = '/index.html'; // Redirect to home or dashboard
+            //        },
+            //        error: function (err) {
+            //            $('#loginError').text('Login failed: ' + (err.responseJSON?.title || 'Invalid credentials.'));
+            //        }
+            //    });
+            //});
         });
     </script>
 </body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</html>-->
