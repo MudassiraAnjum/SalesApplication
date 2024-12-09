@@ -146,7 +146,7 @@
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('role', data.role); // Fixed the space in the key
-                        window.location.href = `/${data.role.toLowerCase()}management.html`; // Redirect based on role
+                        window.location.href = `/${data.role.toLowerCase()}m.html`; // Redirect based on role
                     } else {
                         document.getElementById('message').innerText = 'Invalid username or password';
                     }

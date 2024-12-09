@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SalesApplication.Data;
-using SalesApplication.Dto;
+//using SalesApplication.Dto;
 using SalesApplication.Dtos;
 using SalesApplication.Models;
 using System.IdentityModel.Tokens.Jwt;
