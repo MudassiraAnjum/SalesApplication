@@ -21,6 +21,8 @@ namespace SalesApplication.Mapping
             CreateMap<OrderDetail,ResponseOrderDetailDto>().ReverseMap();
             CreateMap<TerritoryDto,Territory>().ReverseMap();
             CreateMap<Territory,ResponseTerritoryDto>().ReverseMap();
+            CreateMap<Employee, ResponseEmployeeDto>()
+            .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes != null ? new List<string> { src.Notes } : new List<string>()));
 
         }
     }

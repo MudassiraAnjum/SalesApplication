@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Shippers</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00b0ff; /* Light blue color */
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 0.5s;
+        }
+
+        .layout {
+            width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .input-section {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .output-section {
+            width: 45%;
+            padding-left: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section h2 {
+                font-size: 18px;
+                color: #00b0ff;
+                margin-bottom: 10px;
+            }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: #fff;
+            font-size: 14px;
+        }
+
+            .input-field:focus {
+                border-color: #00b0ff;
+                outline: none;
+            }
+
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00b0ff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .button:hover {
+                background-color: #0091cb;
+            }
+
+        .output {
+            background-color: #2a2a2a;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 1s;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Manage Shippers</h1>
+        <div class="layout">
+            <div class="input-section">
+                <!-- Add Shipper Section -->
+                <div class="section">
+                    <h2>Add Shipper</h2>
+                    <input id="addCompanyName" class="input-field" type="text" placeholder="Enter company name">
+                    <input id="addEmail" class="input-field" type="email" placeholder="Enter email">
+                    <input id="addPhone" class="input-field" type="text" placeholder="Enter phone number">
+                    <input id="addPassword" class="input-field" type="password" placeholder="Enter password">
+                    <button class="button" onclick="addShipper()">Add Shipper</button>
+                    <div id="addShipperOutput" class="output"></div>
+                </div>
+
+                <!-- Update Shipper Section -->
+                <div class="section">
+                    <h2>Update Shipper</h2>
+                    <input id="updateShipperId" class="input-field" type="text" placeholder="Enter shipper ID">
+                    <input id="updateCompanyName" class="input-field" type="text" placeholder="Enter updated company name">
+                    <input id="updateEmail" class="input-field" type="email" placeholder="Enter updated email">
+                    <button class="button" onclick="updateShipper()">Update Shipper</button>
+                    <div id="updateShipperOutput" class="output"></div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div id="updateOutput" class="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to add a shipper
+        function addShipper() {
+            const companyName = $('#addCompanyName').val();
+            const phone = $('#addPhone').val();
+            const email = $('#addEmail').val();
+            const password = $('#addPassword').val();
+            const token = localStorage.getItem('token');  // Ensure token is stored as 'token'
+
+            if (!token) {
+                alert('User not authenticated');
+                return;
+            }
+
+            // Basic validation for form fields
+            if (!companyName || !phone || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Validate email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            const shipperData = {
+                companyName: companyName,
+                phone: phone,
+                email: email,
+                password: password
+            };
+
+            $.ajax({
+                url: 'https://localhost:7141/api/Shipper',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + token // Include token in Authorization header
+                },
+                data: JSON.stringify(shipperData),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Shipper added successfully');
+                    } else {
+                        alert('Error adding shipper: ' + (response.message));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Log the full error response to inspect it
+                    console.error('Error details:', xhr.responseJSON);
+                    alert('An error occurred while adding the shipper: ' + (xhr.responseJSON?.message));
+                }
+            });
+        }
+        function updateShipper() {
+            const shipperId = $('#updateShipperId').val();
+            const companyName = $('#updateCompanyName').val();
+            const email = $('#updateEmail').val();
+            const token = localStorage.getItem('token');  // Ensure token is stored as 'token'
+
+            if (!token) {
+                alert('You are not authenticated');
+                return;
+            }
+
+            if (!shipperId || !companyName || !email) {
+                $('#updateShipperOutput').html('<p style="color: red;">Please fill in all fields</p>');
+                return;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                $('#updateShipperOutput').html('<p style="color: red;">Please enter a valid email address</p>');
+                return;
+            }
+
+            $('#updateShipperOutput').html('<div class="loading">Updating shipper...</div>');
+
+            $.ajax({
+                url: `https://localhost:7141/api/Shipper/${shipperId}`, // Corrected URL
+                method: 'PUT',  // Assuming this should be PUT instead of POST
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + token // Include token in Authorization header
+                },
+                data: JSON.stringify({ companyName, email }), // Updated to include only necessary data
+                success: (response) => {
+                    console.log('Shipper updated successfully', response);
+                    alert('Shipper updated successfully');
+                },
+                error: (xhr) => {
+                    const errorMessage = xhr.responseJSON?.message || 'Error updating shipper';
+                    console.log('Error details:', xhr.responseJSON);  // Log the full error response
+                    $('#updateShipperOutput').html(`<p style="color: red;">${errorMessage}</p>`);
+                },
+            });
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #03A9F4;
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h3 {
+            text-align: center;
+            color: #fff;
+            margin-top: 10px;
+            font-size: 18px;
+            animation: fadeIn 3s ease-in-out;
+        }
+
+        .container {
+            width: 400px;
+            margin: 30px auto;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #03A9F4;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+            .button:hover {
+                background-color: #0288d1;
+            }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome Admin,</h1>
+    <h3>Manage your system efficiently</h3>
+
+    <div id="dashboard-container" class="container">
+        <button class="button" onclick="window.location.href='manageEmployees.html'">Manage Employees</button>
+        <button class="button" onclick="window.location.href='manageShippers.html'">Manage Shippers</button>
+        <button class="button" onclick="window.location.href='manageTerritories.html'">Manage Territories</button>
+        <button class="button" onclick="window.location.href='manageOrders.html'">Manage Orders</button>
+        <button class="button" onclick="window.location.href='manageOrderDetails.html'">Manage Order Details</button>
+    </div>
+
+</body>
+</html>

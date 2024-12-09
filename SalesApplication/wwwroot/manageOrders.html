@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #00b0ff; /* Light blue color */
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 0.5s; /* Fade-in animation */
+        }
+
+        /* Layout for Input Area and Output Area */
+        .layout {
+            width: 900px;
+            display: flex;
+            justify-content: flex-start; /* Only show left section */
+            align-items: flex-start;
+        }
+
+        /* Left Section (Input buttons and fields) */
+        .input-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Section for buttons and input fields */
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section h2 {
+                font-size: 18px;
+                color: #00b0ff; /* Light blue color */
+                margin-bottom: 10px;
+            }
+
+        /* Buttons */
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00b0ff; /* Light blue button */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .button:hover {
+                background-color: #0091cb; /* Darker blue on hover */
+            }
+
+        /* Output (Results) */
+        .output {
+            background-color: #2a2a2a;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 1s; /* Fade-in animation */
+            max-height: 300px; /* Set a max height */
+            overflow-y: auto; /* Scroll if content exceeds max height */
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px); /* Start from below */
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0); /* End at original position */
+            }
+        }
+
+        /* List Styles */
+        #dataList {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+            #dataList li {
+                cursor: pointer;
+                padding: 8px;
+                border-bottom: 1px solid #555;
+            }
+
+                #dataList li:hover {
+                    background-color: #444;
+                }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Manage Orders</h1>
+        <div class="layout">
+            <!-- Left Section (Input buttons and fields) -->
+            <div class="input-section">
+                <!-- Get All Orders Section -->
+                <div class="section">
+                    <h2>Order List</h2>
+                    <button id="fetchOrdersBtn" class="button" onclick="getAllOrders()">Fetch All Orders</button>
+                    <div id="ordersOutput" class="output"></div>
+                </div>
+
+                <!-- Get All Shipment Details Section -->
+                <div class="section">
+                    <h2>Shipment List</h2>
+                    <button id="fetchShipmentsBtn" class="button" onclick="getAllShipmentDetails()">Fetch Shipment Details</button>
+                    <div id="shipmentsOutput" class="output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to get all orders
+        function getAllOrders() {
+            const button = $('#fetchOrdersBtn');
+            button.prop('disabled', true); // Disable button during API call
+            $('#ordersOutput').html('<div class="loading">Loading...</div>');
+
+            $.ajax({
+                url: 'https://localhost:7141/api/Order', // Endpoint to get all orders
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`  // Use the token in the Authorization header
+                },
+                success: (response) => {
+                    $('#ordersOutput').html(`<pre>${JSON.stringify(response, null, 2)}</pre>`);
+                },
+                error: (xhr) => {
+                    const errorMessage = xhr.responseJSON?.message || 'Error fetching orders';
+                    $('#ordersOutput').html(`<p style="color: red;">${errorMessage}</p>`);
+                },
+                complete: () => {
+                    button.prop('disabled', false); // Re-enable button
+                }
+            });
+        }
+
+        // Function to get all shipment details
+        function getAllShipmentDetails() {
+            const button = $('#fetchShipmentsBtn');
+            button.prop('disabled', true); // Disable button during API call
+            $('#shipmentsOutput').html('<div class="loading">Loading...</div>');
+
+            $.ajax({
+                url: 'https://localhost:7141/api/Order/allShipDetails', // Endpoint to get all shipment details
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`  // Use the token in the Authorization header
+                },
+                success: (response) => {
+                    $('#shipmentsOutput').html(`<pre>${JSON.stringify(response, null, 2)}</pre>`);
+                },
+                error: (xhr) => {
+                    const errorMessage = xhr.responseJSON?.message || 'Error fetching shipment details';
+                    $('#shipmentsOutput').html(`<p style="color: red;">${errorMessage}</p>`);
+                },
+                complete: () => {
+                    button.prop('disabled', false); // Re-enable button
+                }
+            });
+        }
+    </script>
+</body>
+</html>

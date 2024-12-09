@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Order Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #00b0ff; /* Light blue color */
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 0.5s; /* Fade-in animation */
+        }
+
+        /* Layout for Input Area and Output Area */
+        .layout {
+            width: 900px;
+            display: flex;
+            justify-content: flex-start; /* Only show left section */
+            align-items: flex-start;
+        }
+
+        /* Left Section (Input buttons and fields) */
+        .input-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Section for buttons and input fields */
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section h2 {
+                font-size: 18px;
+                color: #00b0ff; /* Light blue color */
+                margin-bottom: 10px;
+            }
+
+        /* Input Fields */
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #2a2a2a; /* Dark input background */
+            color: #fff;
+            font-size: 14px;
+        }
+
+            .input-field:focus {
+                border-color: #00b0ff; /* Light blue border on focus */
+                outline: none;
+            }
+
+        /* Buttons */
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00b0ff; /* Light blue button */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .button:hover {
+                background-color: #0091cb; /* Darker blue on hover */
+            }
+
+        /* Output (Results) */
+        .output {
+            background-color: #2a2a2a;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 1s; /* Fade-in animation */
+            max-height: 300px; /* Set a max height */
+            overflow-y: auto; /* Scroll if content exceeds max height */
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px); /* Start from below */
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0); /* End at original position */
+            }
+        }
+
+        /* Order List Style */
+        #orderList {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+            #orderList li {
+                cursor: pointer;
+                padding: 8px;
+                border-bottom: 1px solid #555;
+            }
+
+                #orderList li:hover {
+                    background-color: #444;
+                }
+
+        /* Order details style */
+        .order-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+            border: 1px solid #666;
+        }
+
+            .order-item p {
+                margin: 0;
+            }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Manage Order Details</h1>
+        <div class="layout">
+            <!-- Left Section (Input buttons and fields) -->
+            <div class="input-section">
+                <!-- Get All Order IDs -->
+                <div class="section">
+                    <h2>Order List</h2>
+                    <ul id="orderList" class="output">
+                        <!-- List of orders will be populated here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch all order IDs and display order details
+        function fetchOrderList() {
+            const token = localStorage.getItem('token');  // Retrieve token from local storage
+
+            if (!token) {
+                alert('You are not authenticated');
+                return;
+            }
+
+            $.ajax({
+                url: 'https://localhost:7141/api/OrderDetail',  // API to fetch all orders
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
+                },
+                success: function (data) {
+                    console.log("Fetched Order List:", data); // Debug log
+                    // Populate the order list
+                    const orderList = document.getElementById('orderList');
+                    orderList.innerHTML = '';  // Clear the list first
+                    data.forEach(order => {
+                        const li = document.createElement('li');
+                        li.classList.add('order-item');
+                        li.innerHTML = `
+                                <p><strong>Order ID:</strong> ${order.orderId}</p>
+                                <p><strong>Product ID:</strong> ${order.productId}</p>
+                                <p><strong>Quantity:</strong> ${order.quantity}</p>
+                                <p><strong>Unit Price:</strong> $${order.unitPrice.toFixed(2)}</p>
+                                <p><strong>Discount:</strong> ${order.discount * 100}%</p>
+                            `;
+                        orderList.appendChild(li);
+                    });
+                },
+                error: function (error) {
+                    console.log('Error fetching order list:', error);
+                    document.getElementById('orderList').innerText = 'Error fetching order list.';
+                }
+            });
+        }
+
+        // Fetch order list when the page loads
+        fetchOrderList();
+    </script>
+</body>
+</html>

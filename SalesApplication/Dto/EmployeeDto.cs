@@ -91,7 +91,7 @@ namespace SalesApplication.Dto
         [Required(ErrorMessage = "Photo is required.")]
         public byte[] Photo { get; set; } // Base64 or URL format
 
-        public List<string>? Notes { get; set; } // Allow multiple notes
+        public string? Notes { get; set; } // Allow multiple notes
 
         public int? ReportsTo { get; set; }
     }

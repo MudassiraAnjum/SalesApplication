@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Employees</title>
+    <!--<script src="jquery-3.6.0.min.js"></script>-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #00b0ff; /* Light blue color */
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 0.5s; /* Fade-in animation */
+        }
+
+        /* Layout for Input Area and Output Area */
+        .layout {
+            width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        /* Left Section (Input buttons and fields) */
+        .input-section {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Right Section (Output display) */
+        .output-section {
+            width: 45%;
+            padding-left: 20px;
+        }
+
+        /* Section for buttons and input fields */
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section h2 {
+                font-size: 18px;
+                color: #00b0ff; /* Light blue color */
+                margin-bottom: 10px;
+            }
+
+        /* Input Fields */
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #2a2a2a; /* Dark input background */
+            color: #fff;
+            font-size: 14px;
+        }
+
+            .input-field:focus {
+                border-color: #00b0ff; /* Light blue border on focus */
+                outline: none;
+            }
+
+        /* Buttons */
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00b0ff; /* Light blue button */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .button:hover {
+                background-color: #0091cb; /* Darker blue on hover */
+            }
+
+        /* Output (Results) */
+        .output {
+            background-color: #2a2a2a;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 1s; /* Fade-in animation */
+            max-height: 300px; /* Set a max height */
+            overflow-y: auto; /* Scroll if content exceeds max height */
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px); /* Start from below */
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0); /* End at original position */
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Manage Employees</h1>
+        <div class="layout">
+            <!-- Left Section (Input buttons and fields) -->
+            <div class="input-section">
+                <!-- Get Employees by City -->
+                <div class="section">
+                    <h2>Get Employees by City</h2>
+                    <input id="cityInput" class="input-field" type="text" placeholder="Enter city name">
+                    <button class="button" onclick="getEmployeesByCity()">Fetch Employees</button>
+                </div>
+
+                <!-- Get Highest Sale by Employee -->
+                <div class="section">
+                    <h2>Get Highest Sale by Employee</h2>
+                    <input id="yearInput" class="input-field" type="number" placeholder="Enter year">
+                    <button class="button" onclick="getHighestSaleByEmployeeInYear()">Fetch Sales</button>
+                </div>
+
+                <!-- Update Employee -->
+                <div class="section">
+                    <h2>Update Employee (Patch)</h2>
+                    <input id="EmployeeId" class="input-field" type="text" placeholder="Enter employee ID">
+                    <input id="FirstName" class="input-field" type="text" placeholder="Enter new name">
+                    <input id="City" class="input-field" type="text" placeholder="Enter new city">
+                    <button class="button" onclick="updateEmployee()">Update Employee</button>
+                </div>
+            </div>
+
+            <!-- Right Section (Output display) -->
+            <div class="output-section">
+                <div id="cityOutput" class="output"></div>
+                <div id="salesOutput" class="output"></div>
+                <div id="updateOutput" class="output"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Function to get employees by city
+        // Example function to fetch employees by city
+        function getEmployeesByCity() {
+            const city = document.getElementById('cityInput').value;
+            const token = localStorage.getItem('token');  // Retrieve token from local storage
+
+            if (!token) {
+                alert('You are not authenticated');
+                return;
+            }
+
+            if (!city) {
+                document.getElementById('cityOutput').innerText = 'Please enter a city name.';
+                return;
+            }
+
+            $.ajax({
+                url: `https://localhost:7141/api/Employee/bycity/${city}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
+                },
+                success: function (data) {
+                    document.getElementById('cityOutput').innerText = JSON.stringify(data, null, 2);
+                },
+                error: function (error) {
+                    console.log('Error details:', error);
+                    document.getElementById('cityOutput').innerText = 'Error fetching employees.';
+                }
+            });
+        }
+
+
+        // Function to get highest sale by employee in a given year
+        function getHighestSaleByEmployeeInYear() {
+            const year = document.getElementById('yearInput').value;
+            const token = localStorage.getItem('token');  // Retrieve token from local storage
+
+            if (!token) {
+                alert('You are not authenticated');
+                return;
+            }
+
+            $.ajax({
+                url: `https://localhost:7141/api/Employee/highest-sale-in-year/${year}`, // Your API endpoint
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
+                },
+                success: function (data) {
+                    document.getElementById('salesOutput').innerText = JSON.stringify(data, null, 2);
+                },
+                error: function (error) {
+                    document.getElementById('salesOutput').innerText = 'Error fetching sales data.';
+                    console.log('Error details:', error);  // Log error for debugging
+                }
+            });
+        }
+
+
+        // Function to update employee details
+        function updateEmployee() {
+            const id = document.getElementById('EmployeeId').value;
+            const name = document.getElementById('FirstName').value;
+            const city = document.getElementById('City').value;
+            const token = localStorage.getItem('token');  // Retrieve token from local storage
+            console.log('Sending data:', { name: name, city: city });
+            if (!token) {
+                alert('You are not authenticated');
+                return;
+            }
+
+            $.ajax({
+                url: `https://localhost:7141/api/Employee/${id}`, // Your API endpoint
+                method: 'PATCH',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
+                },
+                data: JSON.stringify({ name: name, city: city }),
+                success: function (data) {
+                    document.getElementById('updateOutput').innerText = 'Employee updated successfully.';
+                },
+                error: function (error) {
+                    document.getElementById('updateOutput').innerText = 'Error updating employee.';
+                    console.log('Error details:', error);  // Log error for debugging
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
