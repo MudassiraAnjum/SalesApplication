@@ -7,6 +7,8 @@ using SalesApplication.Data;
 using SalesApplication.IServices;
 using SalesApplication.IServices.Services;
 using SalesApplication.Mapping;
+using SalesApplication.Middleware;
+
 //using SalesApplication.Middleware;
 using System.Text;
 

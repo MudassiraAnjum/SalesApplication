@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Employees</title>
-    <!--<script src="jquery-3.6.0.min.js"></script>-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* Basic Styles */
@@ -55,12 +54,6 @@
         .section {
             margin-bottom: 20px;
         }
-
-            .section h2 {
-                font-size: 18px;
-                color: #00b0ff; /* Light blue color */
-                margin-bottom: 10px;
-            }
 
         /* Input Fields */
         .input-field {
@@ -122,7 +115,6 @@
                 transform: translateY(0); /* End at original position */
             }
         }
-
     </style>
 </head>
 <body>
@@ -145,13 +137,14 @@
                     <button class="button" onclick="getHighestSaleByEmployeeInYear()">Fetch Sales</button>
                 </div>
 
-                <!-- Update Employee -->
+                <!-- Patch Employee -->
                 <div class="section">
-                    <h2>Update Employee (Patch)</h2>
-                    <input id="EmployeeId" class="input-field" type="text" placeholder="Enter employee ID">
-                    <input id="FirstName" class="input-field" type="text" placeholder="Enter new name">
-                    <input id="City" class="input-field" type="text" placeholder="Enter new city">
-                    <button class="button" onclick="updateEmployee()">Update Employee</button>
+                    <h2>Patch Employee</h2>
+                    <input id="employeeId" class="input-field" type="text" placeholder="Enter Employee ID">
+                    <input id="path" class="input-field" type="text" placeholder="Enter field path (e.g. /firstName)">
+                    <input id="op" class="input-field" type="text" placeholder="Enter operation (e.g. replace)">
+                    <input id="value" class="input-field" type="text" placeholder="Enter value (e.g. John)">
+                    <button class="button" onclick="PatchEmployee()">Patch Employee</button>
                 </div>
             </div>
 
@@ -159,13 +152,12 @@
             <div class="output-section">
                 <div id="cityOutput" class="output"></div>
                 <div id="salesOutput" class="output"></div>
-                <div id="updateOutput" class="output"></div>
+                <div id="output" class="output"></div>
             </div>
         </div>
     </div>
     <script>
         // Function to get employees by city
-        // Example function to fetch employees by city
         function getEmployeesByCity() {
             const city = document.getElementById('cityInput').value;
             const token = localStorage.getItem('token');  // Retrieve token from local storage
@@ -190,12 +182,11 @@
                     document.getElementById('cityOutput').innerText = JSON.stringify(data, null, 2);
                 },
                 error: function (error) {
-                    console.log('Error details:', error);
                     document.getElementById('cityOutput').innerText = 'Error fetching employees.';
+                    console.log('Error details:', error);
                 }
             });
         }
-
 
         // Function to get highest sale by employee in a given year
         function getHighestSaleByEmployeeInYear() {
@@ -208,7 +199,7 @@
             }
 
             $.ajax({
-                url: `https://localhost:7141/api/Employee/highest-sale-in-year/${year}`, // Your API endpoint
+                url: `https://localhost:7141/api/Employee/highest-sale-in-year/${year}`,
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
@@ -223,37 +214,52 @@
             });
         }
 
-
         // Function to update employee details
-        function updateEmployee() {
-            const id = document.getElementById('EmployeeId').value;
-            const name = document.getElementById('FirstName').value;
-            const city = document.getElementById('City').value;
+        function PatchEmployee() {
+            const employeeId = document.getElementById('employeeId').value;
+            const path = document.getElementById('path').value;
+            const op = document.getElementById('op').value;
+            const value = document.getElementById('value').value;
+
+            // Validate input
+            if (!employeeId || !path || !op || !value) {
+                document.getElementById('output').innerText = 'Please fill in all fields.';
+                return;
+            }
+
+            // Create the JSON Patch document
+            const patchDoc = [{
+                "path": path,
+                "op": op,
+                "value": value
+            }];
+
+            // Send PATCH request to backend
             const token = localStorage.getItem('token');  // Retrieve token from local storage
-            console.log('Sending data:', { name: name, city: city });
+
             if (!token) {
                 alert('You are not authenticated');
                 return;
             }
 
             $.ajax({
-                url: `https://localhost:7141/api/Employee/${id}`, // Your API endpoint
+                url: `https://localhost:7141/api/Employee/${employeeId}`,
                 method: 'PATCH',
-                contentType: 'application/json',
                 headers: {
-                    'Authorization': `Bearer ${token}`  // Use the token in the Authorization header
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 },
-                data: JSON.stringify({ name: name, city: city }),
+                data: JSON.stringify(patchDoc),
                 success: function (data) {
-                    document.getElementById('updateOutput').innerText = 'Employee updated successfully.';
+                    document.getElementById('output').innerText = 'Employee updated successfully.';
                 },
                 error: function (error) {
-                    document.getElementById('updateOutput').innerText = 'Error updating employee.';
-                    console.log('Error details:', error);  // Log error for debugging
+                    document.getElementById('output').innerText = 'Error updating employee.';
+                    console.log('Error details:', error);
                 }
             });
         }
-
     </script>
 </body>
 </html>
+``

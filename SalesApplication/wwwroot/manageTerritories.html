@@ -145,9 +145,9 @@
         <div class="layout">
             <!-- Left Section (Input buttons and fields) -->
             <div class="input-section">
-                <!-- Add Territory Section -->
+                <!-- Update Territory Section -->
                 <div class="section">
-                    <h2>Add Territory</h2>
+                    <h2>Update Territory</h2>
                     <div class="input-group">
                         <label for="territoryId">Territory ID:</label>
                         <input type="text" id="territoryId" placeholder="Enter territory ID">
@@ -156,49 +156,59 @@
                         <label for="territoryDescription">Territory Description:</label>
                         <input type="text" id="territoryDescription" placeholder="Enter territory description">
                     </div>
-                    <button class="button" onclick="addTerritory()">Add Territory</button>
-                    <div id="addTerritoryOutput" class="output"></div>
+                    <div class="input-group">
+                        <label for="regionId">Region ID:</label>
+                        <input type="number" id="regionId" placeholder="Enter region ID">
+                    </div>
+                    <button class="button" onclick="updateTerritory()">Update Territory</button>
+                    <div id="updateTerritoryOutput" class="output"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function addTerritory() {
+        function updateTerritory() {
             const territoryId = $('#territoryId').val();
             const territoryDescription = $('#territoryDescription').val();
+            const regionId = $('#regionId').val();  // Get region ID from the input
 
             // Validate input
-            if (!territoryId || !territoryDescription) {
-                $('#addTerritoryOutput').html('<p style="color: red;">Please fill in all fields</p>');
+            if (!territoryId || !territoryDescription || !regionId) {
+                $('#updateTerritoryOutput').html('<p style="color: red;">Please fill in all fields</p>');
                 return;
             }
 
             // Show loading message
-            $('#addTerritoryOutput').html('<div class="loading">Adding territory...</div>');
+            $('#updateTerritoryOutput').html('<div class="loading">Updating territory...</div>');
 
-            // Make the AJAX request to add the territory
+            // Make the AJAX request to update the territory
             $.ajax({
-                url: 'https://localhost:7141/api/Territory/update/' + territoryId, // Updated endpoint
-                method: 'PUT', // Changed to PUT as per the controller method
+                url: `https://localhost:7141/api/Territory/update/${territoryId}`, // Correct endpoint with territoryId
+                method: 'PUT', // Using PUT method as per your controller
                 contentType: 'application/json',
-                data: JSON.stringify({ territoryId, territoryDescription }), // Sending data as JSON
+                data: JSON.stringify({
+                    territoryDescription, // Sending updated territory description
+                    regionId: parseInt(regionId) // Ensure regionId is sent as an integer
+                }),
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Using token from localStorage
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Token from localStorage for authorization
                 },
                 success: (response) => {
-                    $('#addTerritoryOutput').html('<p style="color: green;">Territory added successfully!</p>');
+                    $('#updateTerritoryOutput').html('<p style="color: green;">Territory updated successfully!</p>');
                     console.log(response);
                     // Clear input fields
-                    $('#territoryId, #territoryDescription').val('');
+                    $('#territoryId, #territoryDescription, #regionId').val('');
                 },
-                error: (xhr) => {
-                    const errorMessage = xhr.responseJSON?.message || 'Error adding territory';
-                    $('#addTerritoryOutput').html(`<p style="color: red;">${errorMessage}</p>`);
+                error: (xhr, textStatus, errorThrown) => {
+                    const errorMessage = xhr.responseJSON?.message || errorThrown || 'Error updating territory';
+                    $('#updateTerritoryOutput').html(`<p style="color: red;">${errorMessage}</p>`);
+                    console.error('Error Status:', textStatus);
+                    console.error('Error Details:', errorThrown);
+                    console.error('Response:', xhr.responseJSON);
                 },
             });
         }
-
     </script>
 </body>
 </html>

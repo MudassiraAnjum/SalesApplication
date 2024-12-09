@@ -135,6 +135,8 @@
                     <input id="updateShipperId" class="input-field" type="text" placeholder="Enter shipper ID">
                     <input id="updateCompanyName" class="input-field" type="text" placeholder="Enter updated company name">
                     <input id="updateEmail" class="input-field" type="email" placeholder="Enter updated email">
+                    <input id="updatePhone" class="input-field" type="text" placeholder="Enter updated phone number">  <!-- Added Phone -->
+                    <input id="updatePassword" class="input-field" type="password" placeholder="Enter updated password">  <!-- Added Password -->
                     <button class="button" onclick="updateShipper()">Update Shipper</button>
                     <div id="updateShipperOutput" class="output"></div>
                 </div>
@@ -202,10 +204,14 @@
                 }
             });
         }
+
+        // Function to update a shipper
         function updateShipper() {
-            const shipperId = $('#updateShipperId').val();
+            const shipperId = parseInt($('#updateShipperId').val(), 10);
             const companyName = $('#updateCompanyName').val();
             const email = $('#updateEmail').val();
+            const phone = $('#updatePhone').val();  // Add phone
+            const password = $('#updatePassword').val();  // Add password
             const token = localStorage.getItem('token');  // Ensure token is stored as 'token'
 
             if (!token) {
@@ -213,8 +219,9 @@
                 return;
             }
 
-            if (!shipperId || !companyName || !email) {
-                $('#updateShipperOutput').html('<p style="color: red;">Please fill in all fields</p>');
+            // Validate inputs
+            if (isNaN(shipperId) || !companyName || !email || !phone || !password) {
+                $('#updateShipperOutput').html('<p style="color: red;">Please fill in all fields correctly</p>');
                 return;
             }
 
@@ -227,25 +234,27 @@
             $('#updateShipperOutput').html('<div class="loading">Updating shipper...</div>');
 
             $.ajax({
-                url: `https://localhost:7141/api/Shipper/${shipperId}`, // Corrected URL
-                method: 'PUT',  // Assuming this should be PUT instead of POST
+                url: `https://localhost:7141/api/Shipper/${shipperId}`,  // Corrected URL
+                method: 'PUT',  // PUT for updating the existing resource
                 contentType: 'application/json',
                 headers: {
                     'Authorization': 'Bearer ' + token // Include token in Authorization header
                 },
-                data: JSON.stringify({ companyName, email }), // Updated to include only necessary data
+                data: JSON.stringify({ companyName, email, phone, password }), // Include phone and password
                 success: (response) => {
                     console.log('Shipper updated successfully', response);
                     alert('Shipper updated successfully');
                 },
-                error: (xhr) => {
-                    const errorMessage = xhr.responseJSON?.message || 'Error updating shipper';
-                    console.log('Error details:', xhr.responseJSON);  // Log the full error response
+                error: (xhr, status, error) => {
+                    // Log the full error response for debugging
+                    console.error('Error details:', xhr.responseJSON || xhr.responseText);
+
+                    // If there’s a specific message in the response, use it; otherwise, show a generic message
+                    const errorMessage = xhr.responseJSON?.message || 'An error occurred while updating the shipper';
                     $('#updateShipperOutput').html(`<p style="color: red;">${errorMessage}</p>`);
                 },
             });
         }
-
     </script>
 </body>
 </html>
